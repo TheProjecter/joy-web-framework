@@ -1,3 +1,5 @@
+// Copyright (c) Pengyu Yang. All rights reserved
+
 package org.joyframework;
 
 import clojure.lang.IFn;
