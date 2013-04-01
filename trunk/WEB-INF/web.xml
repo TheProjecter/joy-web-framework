@@ -1,0 +1,52 @@
+<?xml version = '1.0' encoding = 'windows-1252'?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                             http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+
+
+  <listener>
+    <!--
+        <listener-class>
+        org.apache.tiles.extras.complete.CompleteAutoloadTilesListener
+        </listener-class>
+    -->
+    <listener-class>
+      org.apache.tiles.web.startup.simple.SimpleTilesListener
+    </listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>joy</servlet-name>
+    <servlet-class>org.joyframework.JoyServlet</servlet-class>
+    <init-param>
+      <param-name>bootstrap</param-name>
+      <param-value>org.joyframework.bugz</param-value>
+    </init-param>
+    <init-param>
+      <param-name>reload-allowed</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>joy</servlet-name>
+    <!--url-pattern>/*</url-pattern-->
+    <url-pattern>/joy/*</url-pattern>
+    <!--url-pattern>/clay/*</url-pattern-->
+  </servlet-mapping>
+
+  <!--login-config>
+    <auth-method>FORM</auth-method>
+    <realm-name>Test JAAS Realm</realm-name>
+    <form-login-config>
+      <form-login-page>/login.jsp</form-login-page>
+      <form-error-page>/login_error.jsp</form-error-page>
+    </form-login-config>
+    </login-config-->
+
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>
