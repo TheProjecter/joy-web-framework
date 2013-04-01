@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+"http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+  <definition name="t" template="/WEB-INF/jsps/layout.jsp">
+    <put-attribute name="title" value="Bugz" />
+    <put-attribute name="body-title" />
+    <put-attribute name="body" />
+    <put-attribute name="footer" value="/WEB-INF/jsps/footer.jsp" />
+  </definition>
+
+  <definition name="login" extends="t">
+    <put-attribute name="body-title" value='Login' />
+    <put-attribute name="body" value="/WEB-INF/jsps/login.jsp" />
+  </definition>
+
+  <definition name="register" extends="t">
+    <put-attribute name="body-title" value='Register' />
+    <put-attribute name="body" value="/WEB-INF/jsps/register.jsp" />
+  </definition>
+
+  <definition name="password" extends="register">
+    <put-attribute name="body" value="/WEB-INF/jsps/password.jsp" />
+  </definition>
+
+  <definition name='bugs' extends='t'>
+    <put-attribute name="body-title" value='Bug List' />
+    <put-attribute name="body" value="/WEB-INF/jsps/bugs.jsp" />    
+  </definition>
+
+  <definition name='bug' extends='t'>
+    <put-attribute name="body-title" value='Add/Edit Bug' />
+    <put-attribute name="body" value="/WEB-INF/jsps/bug.jsp" />    
+  </definition>
+
+  <definition name='bulk' extends='t'>
+    <put-attribute name="body-title" value='Bulk Add/Edit Bugs' />
+    <put-attribute name="body" value="/WEB-INF/jsps/bulk.jsp" />    
+  </definition>
+
+  <definition name='admin' extends='t'>
+    <put-attribute name="body-title" value='Administer Bugz' />
+    <put-attribute name="body" value="/WEB-INF/jsps/admin.jsp" />    
+  </definition>
+
+  <definition name='noauth' extends='t'>
+    <put-attribute name="body-title" value='Not Authorized' />
+    <put-attribute name="body" value="/WEB-INF/jsps/noauth.jsp" />    
+  </definition>
+
+
+</tiles-definitions>

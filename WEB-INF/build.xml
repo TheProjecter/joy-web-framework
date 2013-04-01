@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+
+<project name="joyframework">
+
+  <property name="*jetty-home*"
+            value="/py/opt/jetty-distribution-8.1.8.v20121106/" />
+
+  <property file='build.properties' />
+  
+  <target name="compile">
+    <echo message='${version}' />
+    <javac srcdir="src/java" destdir="classes" debug="on"
+           debuglevel="vars">
+      <classpath>
+        <fileset dir="${*jetty-home*}/lib">
+          <include name="servlet-api-3.0.jar" />
+        </fileset>
+        <fileset dir="lib" includes="clojure-1.4.0.jar" />
+      </classpath>
+    </javac>
+    <!--copy todir='classes'>
+      <fileset dir='src/clj' includes='**/*.clj, **/*.properties' />
+    </copy-->
+  </target>
+
+  <target name="build">
+    <jar destfile="${clay.jar}" basedir="classes"
+         includes="**/JoyServlet.class, **/*.clj,
+                   **/resources.properties"
+         excludes='**/bugz/**'
+         />
+  </target>
+
+  <target name='build-blank-webapp' depends='build'>
+    <property name='blank' value='blank' />
+    <mkdir dir='${blank}' />
+    <mkdir dir='${blank}/WEB-INF' />
+
+    <property name='myapp.lib' value='${blank}/WEB-INF/lib' />
+    <copy todir='${myapp.lib}' >
+      <fileset dir='lib' includes='*.jar' />
+    </copy>
+    <copy file='${clay.jar}' todir='${myapp.lib}' />
+
+    <copy file='myapp.web.xml'
+          tofile='${blank}/WEB-INF/web.xml' />
+
+    <copy file='myapp.tiles.xml'
+          tofile='${blank}/WEB-INF/tiles.xml' />
+
+    <property name='myapp.classes'
+              value='${blank}/WEB-INF/classes/myapp' />
+    <mkdir dir='${myapp.classes}' />
+    <copy file='myapp.bootstrap.clj'
+          tofile='${myapp.classes}/bootstrap.clj' />
+    <copy file='myapp.index.clj'
+          tofile='${myapp.classes}/index.clj' />
+    <copy file='myapp.resources.properties'
+          tofile='${myapp.classes}/resources.properties' />
+
+    <property name='myapp.jsps' value='${blank}/WEB-INF/jsps' />
+    <mkdir dir='${myapp.jsps}' />
+    <copy file='myapp.classic.jsp'
+          tofile='${myapp.jsps}/classic.jsp' />
+    <copy file='myapp.index.jsp'
+          tofile='${myapp.jsps}/index.jsp' />
+    <copy file='myapp.header.jsp'
+          tofile='${myapp.jsps}/header.jsp' />
+    <copy file='myapp.left.jsp'
+          tofile='${myapp.jsps}/left.jsp' />
+    <copy file='myapp.footer.jsp'
+          tofile='${myapp.jsps}/footer.jsp' />
+
+    <war destfile='${blank.webapp}'
+         basedir='blank' />
+    
+  </target>
+</project>
