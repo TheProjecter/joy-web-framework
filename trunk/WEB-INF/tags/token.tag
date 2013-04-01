@@ -1,5 +1,6 @@
 <%--
-   unique token tag.
+  Copyright (c) Pengyu Yang. All rights reserved
+  unique token tag.
 --%>
 <%
  final java.security.SecureRandom
