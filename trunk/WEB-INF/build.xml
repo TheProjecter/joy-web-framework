@@ -24,14 +24,18 @@
   </target>
 
   <target name="build">
-    <jar destfile="${clay.jar}" basedir="classes"
+    <jar destfile="${joy.jar}" basedir="classes"
          includes="**/JoyServlet.class, **/*.clj,
                    **/resources.properties"
          excludes='**/bugz/**'
          />
   </target>
 
-  <target name='build-blank-webapp' depends='build'>
+  <target name='build-blank-webapp' depends='build' >
+    <war destfile='${blank.webapp}' basedir='..' />
+  </target>
+
+  <!--target name='build-blank-webapp' depends='build'>
     <property name='blank' value='blank' />
     <mkdir dir='${blank}' />
     <mkdir dir='${blank}/WEB-INF' />
@@ -40,7 +44,7 @@
     <copy todir='${myapp.lib}' >
       <fileset dir='lib' includes='*.jar' />
     </copy>
-    <copy file='${clay.jar}' todir='${myapp.lib}' />
+    <copy file='${joy.jar}' todir='${myapp.lib}' />
 
     <copy file='myapp.web.xml'
           tofile='${blank}/WEB-INF/web.xml' />
@@ -74,5 +78,5 @@
     <war destfile='${blank.webapp}'
          basedir='blank' />
     
-  </target>
+  </target-->
 </project>
