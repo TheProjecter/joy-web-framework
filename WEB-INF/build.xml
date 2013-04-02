@@ -18,21 +18,19 @@
         <fileset dir="lib" includes="clojure-1.5.1.jar" />
       </classpath>
     </javac>
-    <!--copy todir='classes'>
-      <fileset dir='src/clj' includes='**/*.clj, **/*.properties' />
-    </copy-->
   </target>
 
   <target name="build">
     <jar destfile="${joy.jar}" basedir="classes"
          includes="**/JoyServlet.class, **/*.clj,
                    **/resources.properties"
-         excludes='**/bugz/**'
          />
   </target>
 
   <target name='build-blank-webapp' depends='build' >
+    <move file='${joy.jar}' todir='lib' />
     <war destfile='${blank.webapp}' basedir='..' />
+    <delete file='lib/${joy.jar}' />
   </target>
 
   <!--target name='build-blank-webapp' depends='build'>
