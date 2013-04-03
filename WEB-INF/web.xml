@@ -22,7 +22,7 @@
     <servlet-class>org.joyframework.JoyServlet</servlet-class>
     <init-param>
       <param-name>bootstrap</param-name>
-      <param-value>org.joyframework.welcome</param-value>
+      <param-value>org.joyframework.ddu</param-value>
     </init-param>
     <init-param>
       <param-name>reload-allowed</param-name>

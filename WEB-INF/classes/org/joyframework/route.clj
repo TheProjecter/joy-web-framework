@@ -6,16 +6,15 @@
             [org.joyframework.result :as r])
   (:import java.io.FileNotFoundException))
 
-(def ^:dynamic *M* "Mappings in the bootstrap namespace.")
+(def ^:dynamic *bootstraps* "Mappings in the bootstrap namespace.")
 
 (declare get-request-path get-route get-handler checkbox validate
          valid-http-method? valid-token? invoke trim-slashes)
 
 (defn service
   ""
-  [;;{rt 'rt :as M}
-   M request response]
-  (binding [*M* M
+  [bss request response]
+  (binding [*bootstraps* bss
             *http-request* request
             *http-method* (.getMethod request)
             *http-response* response
@@ -32,7 +31,7 @@
             (apply args))
           (r/not-found))
         (catch Exception ex
-          (if-let [h ('exception-handler M)] (h ex) (throw ex))
+          (if-let [h ('exception-handler *bootstraps*)] (h ex) (throw ex))
           ))
       )))
 
@@ -129,7 +128,7 @@
 (defn- get-route
   ""
   [request-path]
-  (loop [[r & rs :as path] request-path m (var-get ('rt *M*))]
+  (loop [[r & rs :as path] request-path m (var-get ('rt *bootstraps*))]
     (if-let [sub-rt (m r)]
       (recur rs sub-rt) (assoc m :path path)))
   )
