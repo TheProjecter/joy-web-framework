@@ -5,11 +5,19 @@
 <tiles-definitions>
   <definition name="t" template="/WEB-INF/jsps/classic.jsp">
     <put-attribute name="lmenu" />
+    <put-attribute name="toolbar" />
     <put-attribute name="body" />
   </definition>
 
   <definition name="index" extends="t">
     <put-attribute name="lmenu" value="/WEB-INF/jsps/lmenu.jsp" />
+    <put-attribute name="toolbar" value='' />
+    <put-attribute name="body" value="/WEB-INF/jsps/index.jsp" />
+  </definition>
+
+  <definition name="logs" extends="t">
+    <put-attribute name="lmenu" value="/WEB-INF/jsps/lmenu.jsp" />
+    <put-attribute name="toolbar" value='/WEB-INF/jsps/logs_toolbar.jsp' />
     <put-attribute name="body" value="/WEB-INF/jsps/index.jsp" />
   </definition>
 

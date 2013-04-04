@@ -10,3 +10,5 @@
 (res/load-resources :res 'org.joyframework.ddu)
 
 (defn index [] (rs/tiles "index"))
+
+(defn logs [] (rs/tiles "logs"))
