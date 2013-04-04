@@ -21,7 +21,14 @@
               <td width='160' valign='top' >
                 <tiles:insertAttribute name="lmenu" />
               </td>
-              <td><tiles:insertAttribute name="body" /></td>
+              <td valign='top' >
+                <table width='100%'>
+                  <tr height='40'><td><tiles:insertAttribute name='toolbar' /></td></tr>
+                  <tr><td>
+                      <tiles:insertAttribute name="body" />
+                  </td></tr>
+                </table>
+              </td>
             </tr>
             <tr height='60'><td colspan='2'>Footer</td></tr>
           </table>

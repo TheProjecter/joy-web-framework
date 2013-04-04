@@ -1,3 +1,3 @@
 <table>
-  <tr><td>${res['logs']}</td></tr>
+  <tr><td><a href='joy/logs'>${res['logs']}</a></td></tr>
 </table>
