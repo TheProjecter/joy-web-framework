@@ -8,8 +8,8 @@
 
 (def ^:dynamic *bootstraps* "Mappings in the bootstrap namespace.")
 
-(declare get-request-path get-route get-handler checkbox validate
-         valid-http-method? valid-token? invoke trim-slashes)
+(declare get-request-path get-route get-handler get-handler-from-path
+         checkbox validate valid-http-method? valid-token? invoke trim-slashes)
 
 (defn service
   ""
@@ -136,19 +136,19 @@
 (defn- get-handler
   "Finds the proper function to handle the request."
   [{ns :ns path :path}]
-  (println "ns:" ns ", path:" path)
   (let [ns-pubs (ns-publics ns)]
-    ;;(println "ns-pubs:" ns-pubs ", params:" *http-params*)
     (if-let [h0 (first (for [[pk pv] ns-pubs [pa _] *http-params*
                              :when (= (str pk) pa)] pv))]
       [h0 path ns]
-
-      (if-let [h1 (and (not (empty? path))
-                       (ns-pubs (symbol (first path))))]
+      (if-let [h1 (get-handler-from-path path ns-pubs)]
         [h1 (rest path) ns]
         [(ns-pubs (or (:default (meta ns)) INDEX)) path ns])
       )))
 
+(defn- get-handler-from-path [path ns-pubs]
+  (if-let [fst (first path)]
+    (or (ns-pubs (symbol (str *http-method* "-" fst)))
+        (ns-pubs (symbol fst)))))
 
 (defmacro defroutes
   "Usage: (defroutes [a.b.c d e] x.y.z)"  

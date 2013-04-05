@@ -67,7 +67,6 @@
        (aset args 0 *http-request*)
        (aset args 1 *http-response*)
        (doseq [[nm val] http-attrs]
-         ;;(println "-----> nm:" nm ", val:" val)
          (.setAttribute *http-request* nm val))
        (.render (ServletUtil/getContainer *servlet-context*) id args)))
   )
