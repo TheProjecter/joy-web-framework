@@ -6,7 +6,8 @@
             [org.joyframework.resources :reload true :as res]
             [org.joyframework.servlet :reload true :as servlet]
             [org.joyframework.db :reload true :as db]
-            [clj-time.core :as dt]))
+            [clj-time.core :as dt]
+            [clojure.java.jdbc :as sql]))
 
 (route/defroutes rt org.joyframework.ddu)
 
@@ -24,6 +25,14 @@
   )
 
 (defn- get-logs-created-in [year month]
+  (sql/with-connection {:datasource ds}
+    (sql/with-query-results res
+      ["select * from logs where year = ? and month = ?" year month]
+      (doseq [rec res]
+        (println rec)
+        )
+      )
+    )
   (rs/tiles "logs" {"logs" [{"id" 1 "title" "title1"}
                             {"id" 2 "title" "title2"}]})
   )

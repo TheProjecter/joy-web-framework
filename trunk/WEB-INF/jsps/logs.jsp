@@ -16,7 +16,7 @@
       <td>&nbsp;</td>
       <td>${log['id']}</td>
       <td>
-        <a href='../log/${log['id']}'>${log['title']}</a>
+        <a href='/ddu/joy/log/${log['id']}'>${log['title']}</a>
       </td>
     </tr>
   </c:forEach>
