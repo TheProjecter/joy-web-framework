@@ -1,13 +1,13 @@
-; Copyright (c) Pengyu Yang. All rights reserved
+                                        ; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns ^{:path "/"} org.joyframework.ddu
-  (:require [org.joyframework.route :reload true :as route]
-            [org.joyframework.result :reload true :as rs]
-            [org.joyframework.resources :reload true :as res]
-            [org.joyframework.servlet :reload true :as servlet]
-            [org.joyframework.db :reload true :as db]
-            [clj-time.core :as dt]
-            [clojure.java.jdbc :as sql]))
+    (:require [org.joyframework.route :reload true :as route]
+              [org.joyframework.result :reload true :as rs]
+              [org.joyframework.resources :reload true :as res]
+              [org.joyframework.servlet :reload true :as servlet]
+              [org.joyframework.db :reload true :as db]
+              [clj-time.core :as dt]
+              [clojure.java.jdbc :as sql]))
 
 (route/defroutes rt org.joyframework.ddu)
 
@@ -28,14 +28,18 @@
   (sql/with-connection {:datasource ds}
     (sql/with-query-results res
       ["select * from logs where year = ? and month = ?" year month]
-      (doseq [rec res]
-        (println rec)
-        )
+;;      (println res)
+      (rs/tiles "logs" {"logs"
+                        
+                        (map #(reduce (fn [[k1 v1] [k2 v2]]
+                                        ;; (conj {(name k1) v1} {(name k2) v2})
+                                        (println k1 "==>" v1 ","
+                                                 k2 "==>" v2)
+                                        ) %) res)
+
+                        })
       )
-    )
-  (rs/tiles "logs" {"logs" [{"id" 1 "title" "title1"}
-                            {"id" 2 "title" "title2"}]})
-  )
+    ))
 
 (defn- get-logs-created-between [{starty :year startm :month}
                                  {endy :year endm :month}]
