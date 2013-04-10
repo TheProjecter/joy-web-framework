@@ -32,8 +32,8 @@
   (sql/with-connection {:datasource ds}
     (sql/with-query-results res
       ["select * from logs where year = ? and month = ?" year month]
-      (rs/tiles "logs" {"logs"
-                        (map #(rs-to-map %) res)})
+      (rs/tiles "logs" {"logs" (map #(rs-to-map %) res)
+                        "year" year "month" month})
       ))
   )
 
@@ -42,7 +42,8 @@
   )
 
 (defn GET-logs
-  ([] (println "GET-logs") (rs/tiles "logs"))
+  ([] (let [today (dt/today)]
+        (get-logs-created-in (dt/year today) (dt/month today))))
   ([year]
      (get-logs-created-in year (dt/month (dt/today))))
   ([year month]
@@ -50,16 +51,37 @@
   )
 
 (defn POST-logs []
-  (println "yes, this is POST-logs.")
+  (get-logs-created-in (servlet/param "year") (servlet/param "month"))
   )
 
 (defn GET-log [id]
-  (sql/with-connection {:datasource ds}
-    (sql/with-query-results res ["select * from logs where id = ?" id]
-      (rs/tiles "log" {"log" (rs-to-map (first res))})
-      ))
+  (try
+    (if (<= (Integer/parseInt id) 0)
+      (rs/tiles "log-edit")
+      (sql/with-connection {:datasource ds}
+        (sql/with-query-results res ["select * from logs where id = ?" id]
+          ;;(if (= 0 (count res)))
+          (rs/tiles "log" {"log" (rs-to-map (first res))})
+          ))
+      )
+    (catch Exception ex)
+    )
   )
 
-(defn POST-log []
+(defn- next-id []
+  (sql/with-connection {:datasource ds}
+    (sql/with-query-results [m] ["call next value for seq"]
+      (first (vals m))
+      )))
 
+(defn POST-log []
+  (let [nid (next-id) today (dt/today) year (dt/year today)
+        month (dt/month today) date (dt/day today) 
+        title (servlet/param "title") content (servlet/param "content")]
+    (sql/with-connection {:datasource ds}
+      (sql/insert-record "logs" {:id nid :title title :content content
+                                 :year year :month month :date date})
+      )
+    (get-logs-created-in year month)
+    )
   )
