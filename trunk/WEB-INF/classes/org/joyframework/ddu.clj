@@ -28,18 +28,11 @@
   (sql/with-connection {:datasource ds}
     (sql/with-query-results res
       ["select * from logs where year = ? and month = ?" year month]
-;;      (println res)
       (rs/tiles "logs" {"logs"
-                        
-                        (map #(reduce (fn [[k1 v1] [k2 v2]]
-                                        ;; (conj {(name k1) v1} {(name k2) v2})
-                                        (println k1 "==>" v1 ","
-                                                 k2 "==>" v2)
-                                        ) %) res)
-
-                        })
-      )
-    ))
+                        (map #(reduce (fn [rs [k v]]
+                                        (conj rs {(name k) v})) {} %) res)})
+      ))
+  )
 
 (defn- get-logs-created-between [{starty :year startm :month}
                                  {endy :year endm :month}]
