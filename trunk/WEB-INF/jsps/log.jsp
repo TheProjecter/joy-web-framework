@@ -6,7 +6,7 @@
   </tr>
   <tr>
     <td colspan='2'>
-      Content
+      ${log['content']}
     </td>
   </tr>
 </table>
