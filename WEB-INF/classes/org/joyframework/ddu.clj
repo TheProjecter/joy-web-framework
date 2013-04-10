@@ -1,4 +1,4 @@
-                                        ; Copyright (c) Pengyu Yang. All rights reserved
+;; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns ^{:path "/"} org.joyframework.ddu
     (:require [org.joyframework.route :reload true :as route]
