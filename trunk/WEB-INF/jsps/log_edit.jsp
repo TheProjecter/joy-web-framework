@@ -6,12 +6,12 @@
   <form method='post' action='/ddu/joy/log'>
     <tr>
       <td width='80'>${res['title']}</td>
-      <td ><input name='title' /></td>
+      <td ><input name='title' value='${log['title']}' /></td>
     </tr>
     <tr>
       <td>${res['content']}</td>
       <td >
-        <textarea cols='40' rows='20' name='content'></textarea>
+        <textarea cols='40' rows='20' name='content'>${log["content"]}</textarea>
       </td>
     </tr>
     <tr>

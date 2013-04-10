@@ -20,13 +20,8 @@
 
 (defn index [] (rs/tiles "index"))
 
-(defn- get-logs [{year :year month :month}]
-  (println (.getConnection ds))
-  )
-
 (defn- rs-to-map [rs]
-  (reduce (fn [r [k v]] (conj r {(name k) v})) {} rs)
-  )
+  (reduce (fn [r [k v]] (conj r {(name k) v})) {} rs))
 
 (defn- get-logs-created-in [year month]
   (sql/with-connection {:datasource ds}
@@ -38,8 +33,7 @@
   )
 
 (defn- get-logs-created-between [{starty :year startm :month}
-                                 {endy :year endm :month}]
-  )
+                                 {endy :year endm :month}])
 
 (defn GET-logs
   ([] (let [today (dt/today)]
@@ -54,16 +48,17 @@
   (get-logs-created-in (servlet/param "year") (servlet/param "month"))
   )
 
+(defn- get-log [id target]
+  (sql/with-connection {:datasource ds}
+    (sql/with-query-results res ["select * from logs where id = ?" id]
+      ;;(if (= 0 (count res)))
+      (rs/tiles target {"log" (rs-to-map (first res))})
+      )))
+
 (defn GET-log [id]
   (try
     (if (<= (Integer/parseInt id) 0)
-      (rs/tiles "log-edit")
-      (sql/with-connection {:datasource ds}
-        (sql/with-query-results res ["select * from logs where id = ?" id]
-          ;;(if (= 0 (count res)))
-          (rs/tiles "log" {"log" (rs-to-map (first res))})
-          ))
-      )
+      (rs/tiles "log-edit") (get-log id "log"))
     (catch Exception ex)
     )
   )
@@ -85,3 +80,5 @@
     (get-logs-created-in year month)
     )
   )
+
+(defn edit [_ id] (get-log id "log-edit"))
