@@ -1,4 +1,4 @@
-; Copyright (c) Pengyu Yang. All rights reserved
+;; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.result
   (:use [org.joyframework servlet] )
