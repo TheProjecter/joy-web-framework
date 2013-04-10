@@ -24,13 +24,16 @@
   (println (.getConnection ds))
   )
 
+(defn- rs-to-map [rs]
+  (reduce (fn [r [k v]] (conj r {(name k) v})) {} rs)
+  )
+
 (defn- get-logs-created-in [year month]
   (sql/with-connection {:datasource ds}
     (sql/with-query-results res
       ["select * from logs where year = ? and month = ?" year month]
       (rs/tiles "logs" {"logs"
-                        (map #(reduce (fn [rs [k v]]
-                                        (conj rs {(name k) v})) {} %) res)})
+                        (map #(rs-to-map %) res)})
       ))
   )
 
@@ -51,7 +54,10 @@
   )
 
 (defn GET-log [id]
-  (rs/tiles "log" {"log" {"id" id "title" "title1"}})
+  (sql/with-connection {:datasource ds}
+    (sql/with-query-results res ["select * from logs where id = ?" id]
+      (rs/tiles "log" {"log" (rs-to-map (first res))})
+      ))
   )
 
 (defn POST-log []
