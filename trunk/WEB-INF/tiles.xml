@@ -27,4 +27,8 @@
     <put-attribute name="body" value="/WEB-INF/jsps/log_edit.jsp" />
   </definition>
 
+  <definition name="tags" extends="logs">
+    <put-attribute name='body' value='/WEB-INF/jsps/tags.jsp' />
+  </definition>
+
 </tiles-definitions>
