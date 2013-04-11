@@ -20,6 +20,10 @@
 
 (defn index [] (rs/tiles "index"))
 
+(defn- today []
+  (let [d (dt/today)]
+    [(dt/year d) (dt/month d) (dt/day d)]))
+
 (defn- rs-to-map [rs]
   (reduce (fn [r [k v]] (conj r {(name k) v})) {} rs))
 
@@ -50,16 +54,16 @@
 
 (defn- get-log [id target]
   (sql/with-connection {:datasource ds}
-    (sql/with-query-results res ["select * from logs where id = ?" id]
+    (sql/with-query-results [log] ["select * from logs where id = ?" id]
       ;;(if (= 0 (count res)))
-      (rs/tiles target {"log" (rs-to-map (first res)) "id" id})
+      (rs/tiles target {"log" (rs-to-map log) "id" id})
       )))
 
 (defn GET-log [id]
   (try
     (if (<= (Integer/parseInt id) 0)
       (rs/tiles "log-edit" {"id" 0}) (get-log id "log"))
-    (catch Exception ex)
+    (catch Exception ex (.printStackTrace ex))
     )
   )
 
@@ -70,21 +74,23 @@
       )))
 
 (defn POST-log [id]
-  (let [title (servlet/param "title") content (servlet/param "content")]
-    (try
-      (sql/with-connection {:datasource ds}
-        (if (<= (Integer/parseInt id) 0)
-          (let [nid (next-id) today (dt/today) year (dt/year today)
-                month (dt/month today) date (dt/day today)]
-            (sql/insert-record "logs" {:id nid :title title :content content
-                                       :year year :month month :date date})
-            (GET-log nid))
-          (do
-            (sql/update-values "log" ["id" id] {:title title :content content})
-            (GET-log id))))
-      (catch Exception ex))
-    )
+  (let [title (servlet/param "title") content (servlet/param "content")
+        insert? (<= (Integer/parseInt id) 0) tid (if insert? (next-id) id)]
+    (sql/with-connection {:datasource ds}
+      (if insert?
+        (let [[year month date] (today)]
+          (sql/insert-record "logs" {:id tid :title title :content content
+                                     :year year :month month :date date}))
+        (sql/update-values "logs" ["id=?" tid] {:title title :content content}))
+      )
+    (get-log tid "log"))
   )
 
 (defn edit [_ id] (get-log id "log-edit"))
 
+(defn GET-tags []
+  (sql/with-connection {:datasource ds}
+    ;;(sql/with-query-results )
+    )
+  (rs/tiles "tags")
+  )
