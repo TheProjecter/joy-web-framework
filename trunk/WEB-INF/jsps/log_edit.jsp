@@ -3,7 +3,7 @@
 </style>
 
 <table border='1' width='100%'>
-  <form method='post' action='/ddu/joy/log'>
+  <form method='post' action='/ddu/joy/log/${id}'>
     <tr>
       <td width='80'>${res['title']}</td>
       <td ><input name='title' value='${log['title']}' /></td>

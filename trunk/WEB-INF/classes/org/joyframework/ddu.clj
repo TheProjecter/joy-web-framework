@@ -52,13 +52,13 @@
   (sql/with-connection {:datasource ds}
     (sql/with-query-results res ["select * from logs where id = ?" id]
       ;;(if (= 0 (count res)))
-      (rs/tiles target {"log" (rs-to-map (first res))})
+      (rs/tiles target {"log" (rs-to-map (first res)) "id" id})
       )))
 
 (defn GET-log [id]
   (try
     (if (<= (Integer/parseInt id) 0)
-      (rs/tiles "log-edit") (get-log id "log"))
+      (rs/tiles "log-edit" {"id" 0}) (get-log id "log"))
     (catch Exception ex)
     )
   )
@@ -69,16 +69,22 @@
       (first (vals m))
       )))
 
-(defn POST-log []
-  (let [nid (next-id) today (dt/today) year (dt/year today)
-        month (dt/month today) date (dt/day today) 
-        title (servlet/param "title") content (servlet/param "content")]
-    (sql/with-connection {:datasource ds}
-      (sql/insert-record "logs" {:id nid :title title :content content
-                                 :year year :month month :date date})
-      )
-    (get-logs-created-in year month)
+(defn POST-log [id]
+  (let [title (servlet/param "title") content (servlet/param "content")]
+    (try
+      (sql/with-connection {:datasource ds}
+        (if (<= (Integer/parseInt id) 0)
+          (let [nid (next-id) today (dt/today) year (dt/year today)
+                month (dt/month today) date (dt/day today)]
+            (sql/insert-record "logs" {:id nid :title title :content content
+                                       :year year :month month :date date})
+            (GET-log nid))
+          (do
+            (sql/update-values "log" ["id" id] {:title title :content content})
+            (GET-log id))))
+      (catch Exception ex))
     )
   )
 
 (defn edit [_ id] (get-log id "log-edit"))
+
