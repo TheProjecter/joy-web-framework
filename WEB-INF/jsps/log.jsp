@@ -1,4 +1,8 @@
 
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix='fmt' uri='http://java.sun.com/jsp/jstl/fmt' %>
+
 <table border='1' width='100%'>
   <tr>
     <td width='30'>&nbsp;</td>
@@ -6,10 +10,31 @@
     <td width='60'>
       <a href='/ddu/joy/log/${log['id']}?edit'>${res['edit']}</a>
     </td>
+    <td width='60'>
+      <a href='/ddu/joy/log/${log['id']}?delete'>${res['del']}</a>
+    </td>
   </tr>
   <tr>
-    <td colspan='3'>
+    <td colspan='4'>
       ${log['content']}
+    </td>
+  </tr>
+  <tr>
+    <td colspan='4'>
+      <table>
+        <c:forEach items='${tags}' var='t' varStatus='vs'>
+        <c:if test='${st.index % 4 == 0}' ><tr></c:if>
+        <td width='80'>${t['tag']}</td>
+        <c:choose>
+        <c:when test='${st.index % 4 == 3}'></tr></c:when>
+        <c:when test='${st.last}'>
+        <c:forEach begin='0' end='${4 - st.index % 4 - 2}'>
+        <td>&nbsp;</td>
+        </c:forEach></tr>
+        </c:when>
+        </c:choose>
+        </c:forEach>
+      </table>
     </td>
   </tr>
 </table>
