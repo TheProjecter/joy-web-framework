@@ -90,7 +90,12 @@
 
 (defn GET-tags []
   (sql/with-connection {:datasource ds}
-    ;;(sql/with-query-results )
+    (sql/with-query-results tags ["select * from tags"]
+      (rs/tiles "tags" {"tags" (map #(rs-to-map %) tags)})
+      )
     )
-  (rs/tiles "tags")
+  )
+
+(defn GET-tag [id]
+  (rs/tiles "tag")
   )
