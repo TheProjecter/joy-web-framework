@@ -97,5 +97,18 @@
   )
 
 (defn GET-tag [id]
-  (rs/tiles "tag")
+  (rs/tiles "tag" {"tag" {} "id" id})
+  )
+
+(defn POST-tag [id]
+  (let [insert? (<= (Integer/parseInt id) 0)
+        tid (if insert? (next-id) id)
+        tag (servlet/param "tag")]
+    (sql/with-connection {:datasource ds}
+      (if insert?
+        (sql/insert-record "tags" {:id tid :tag tag})
+        (sql/update-values "tags" ["id=?" tid] {:tag tag}))
+      )
+    (GET-tags)
+    )
   )
