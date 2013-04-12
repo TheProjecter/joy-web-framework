@@ -28,20 +28,15 @@
   (reduce (fn [r [k v]] (conj r {(name k) v})) {} rs))
 
 (defn- get-logs-created-in [year month]
-  (sql/with-connection {:datasource ds}
-    (sql/with-query-results res
-      ["select * from logs where year = ? and month = ?" year month]
-      (rs/tiles "logs" {"logs" (map #(rs-to-map %) res)
-                        "year" year "month" month})
-      ))
-  )
+  (db/select ds ["select * from logs where year = ? and month = ?" year month]
+             #(rs/tiles "logs" {"logs" % "year" year "month" month})))
 
 (defn- get-logs-created-between [{starty :year startm :month}
                                  {endy :year endm :month}])
 
 (defn GET-logs
-  ([] (let [today (dt/today)]
-        (get-logs-created-in (dt/year today) (dt/month today))))
+  ([] (let [[year month] (today)]
+        (get-logs-created-in year month)))
   ([year]
      (get-logs-created-in year (dt/month (dt/today))))
   ([year month]
@@ -52,17 +47,30 @@
   (get-logs-created-in (servlet/param "year") (servlet/param "month"))
   )
 
-(defn- get-log [id target]
+(defn- get-log* [id]
   (sql/with-connection {:datasource ds}
-    (sql/with-query-results [log] ["select * from logs where id = ?" id]
-      ;;(if (= 0 (count res)))
-      (rs/tiles target {"log" (rs-to-map log) "id" id})
-      )))
+    [(sql/with-query-results [log] ["select * from logs where id = ?" id]
+         ;;(if (= 0 (count res)))
+       log)
+     (sql/with-query-results [tags]
+       ["select t.* from tags t, log_tags lt where lt.log_id = ? and lt.tag_id = t.id" id])
+     ] 
+    )
+  )
+
+(defn- get-log [id target]
+  (rs/tiles target {"log" (rs-to-map (get-log* id)) "id" id})
+  )
+
+(defn- select-log [id target]
+  (db/select ds ["select * from logs where id =?" id]
+             #(rs/tiles target {"log" (first %) "id" id})
+             ))
 
 (defn GET-log [id]
   (try
     (if (<= (Integer/parseInt id) 0)
-      (rs/tiles "log-edit" {"id" 0}) (get-log id "log"))
+      (rs/tiles "log-edit" {"id" 0}) (select-log id "log"))
     (catch Exception ex (.printStackTrace ex))
     )
   )
@@ -97,7 +105,11 @@
   )
 
 (defn GET-tag [id]
-  (rs/tiles "tag" {"tag" {} "id" id})
+  (sql/with-connection {:datasource ds}
+    (sql/with-query-results [t] ["select * from tags where id = ?" id]
+      (rs/tiles "tag" {"tag" (rs-to-map t) "id" id})      
+      )
+    )
   )
 
 (defn POST-tag [id]
@@ -111,4 +123,33 @@
       )
     (GET-tags)
     )
+  )
+
+(defmulti delete (fn [target _] target))
+
+(defmethod delete "tag" [_ id]
+  ;;(println "delete tag:" id)
+  (sql/with-connection {:datasource ds}
+    (sql/delete-rows "tags" ["id=?" id]))
+  (GET-tags))
+
+(defmethod delete "log" [_ id]
+  ;;(println "delete log:" id)
+  (let [{year :year month :month} (get-log* id)]
+    (sql/with-connection {:datasource ds}
+      (sql/delete-rows "logs" ["id=?" id]))
+    (GET-logs year month)
+    )
+  )
+
+(defn select []
+;  (sql/with-connection {:datasource ds}
+;;    (sql/with-query-results res ["select * from logs"]
+;;      (println (map db/foo res))
+;;      )
+;;    )
+;;  (println (db/select {:datasource ds} ["select * from logs"]))
+  (let [rs (db/select ds ["select * from logs"])]
+    (println "rs==>" rs)
+    ) 
   )

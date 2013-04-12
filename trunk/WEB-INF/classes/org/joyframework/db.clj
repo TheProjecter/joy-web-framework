@@ -1,7 +1,8 @@
 ; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.db
-  (:require [clojure.string :as str])
+  (:require [clojure.string :as str]
+            [clojure.java.jdbc :as sql])
   (:import com.jolbox.bonecp.BoneCPDataSource))
 
 
@@ -36,3 +37,15 @@
         ))
     )
   )
+
+(defn foo [m]
+  (into {} (map (fn [[k v]] {(name k)
+                             (cond (map? v) (foo v)
+                                   (vector? v) (into [] (map foo v))
+                                   :else v)}) m)))
+
+(defn select [ds query f]
+  (sql/with-connection {:datasource ds}
+    (sql/with-query-results res query
+      (f (map foo res))
+      )))
