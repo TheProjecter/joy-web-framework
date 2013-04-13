@@ -28,8 +28,10 @@
   (reduce (fn [r [k v]] (conj r {(name k) v})) {} rs))
 
 (defn- get-logs-created-in [year month]
-  (db/select ds ["select * from logs where year = ? and month = ?" year month]
-             #(rs/tiles "logs" {"logs" % "year" year "month" month})))
+  (rs/tiles "logs"
+            {"logs" (db/select ds ["select * from logs where year = ? and month = ?"
+                                   year month]) "year" year "month" month})
+  )
 
 (defn- get-logs-created-between [{starty :year startm :month}
                                  {endy :year endm :month}])
@@ -58,19 +60,23 @@
     )
   )
 
-(defn- get-log [id target]
-  (rs/tiles target {"log" (rs-to-map (get-log* id)) "id" id})
-  )
+;;(defn- get-log [id target] (rs/tiles target {"log" (rs-to-map (get-log* id)) "id" id}))
 
-(defn- select-log [id target]
-  (db/select ds ["select * from logs where id =?" id]
-             #(rs/tiles target {"log" (first %) "id" id})
-             ))
+(defn- select-log
+  ([id] (let [log (first (db/select ds ["select * from logs where id =?" id]))
+              tags (db/select ds ["select id, tag from tags, log_tags 
+where tags.id = log_tags.tag_id and log_tags.log_id = ?" id])]
+          (println "tags:" tags)
+          (assoc log "tags" tags)
+          ))
+  ([id target] (rs/tiles target {"log" (select-log id) "id" id}))
+  )
 
 (defn GET-log [id]
   (try
     (if (<= (Integer/parseInt id) 0)
-      (rs/tiles "log-edit" {"id" 0}) (select-log id "log"))
+      (rs/tiles "log-edit" {"id" 0})
+      (select-log id "log"))
     (catch Exception ex (.printStackTrace ex))
     )
   )
@@ -91,10 +97,10 @@
                                      :year year :month month :date date}))
         (sql/update-values "logs" ["id=?" tid] {:title title :content content}))
       )
-    (get-log tid "log"))
+    (select-log tid "log"))
   )
 
-(defn edit [_ id] (get-log id "log-edit"))
+(defn edit [_ id] (select-log id "log-edit"))
 
 (defn GET-tags []
   (sql/with-connection {:datasource ds}
@@ -134,8 +140,7 @@
   (GET-tags))
 
 (defmethod delete "log" [_ id]
-  ;;(println "delete log:" id)
-  (let [{year :year month :month} (get-log* id)]
+  (let [{year "year" month "month"} (select-log id)]
     (sql/with-connection {:datasource ds}
       (sql/delete-rows "logs" ["id=?" id]))
     (GET-logs year month)

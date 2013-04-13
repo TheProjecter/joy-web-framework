@@ -44,8 +44,8 @@
                                    (vector? v) (into [] (map foo v))
                                    :else v)}) m)))
 
-(defn select [ds query f]
+(defn select [ds query]
   (sql/with-connection {:datasource ds}
     (sql/with-query-results res query
-      (f (map foo res))
+      (vec (map foo res))
       )))

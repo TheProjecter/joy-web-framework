@@ -22,13 +22,13 @@
   <tr>
     <td colspan='4'>
       <table>
-        <c:forEach items='${tags}' var='t' varStatus='vs'>
-        <c:if test='${st.index % 4 == 0}' ><tr></c:if>
+        <c:forEach items='${log["tags"]}' var='t' varStatus='vs'>
+        <c:if test='${vs.index % 4 == 0}' ><tr></c:if>
         <td width='80'>${t['tag']}</td>
         <c:choose>
-        <c:when test='${st.index % 4 == 3}'></tr></c:when>
-        <c:when test='${st.last}'>
-        <c:forEach begin='0' end='${4 - st.index % 4 - 2}'>
+        <c:when test='${vs.index % 4 == 3}'></tr></c:when>
+        <c:when test='${vs.last}'>
+        <c:forEach begin='0' end='${4 - vs.index % 4 - 2}'>
         <td>&nbsp;</td>
         </c:forEach></tr>
         </c:when>
