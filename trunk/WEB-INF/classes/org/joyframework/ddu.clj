@@ -49,26 +49,14 @@
   (get-logs-created-in (servlet/param "year") (servlet/param "month"))
   )
 
-(defn- get-log* [id]
-  (sql/with-connection {:datasource ds}
-    [(sql/with-query-results [log] ["select * from logs where id = ?" id]
-         ;;(if (= 0 (count res)))
-       log)
-     (sql/with-query-results [tags]
-       ["select t.* from tags t, log_tags lt where lt.log_id = ? and lt.tag_id = t.id" id])
-     ] 
-    )
-  )
-
 ;;(defn- get-log [id target] (rs/tiles target {"log" (rs-to-map (get-log* id)) "id" id}))
 
 (defn- select-log
   ([id] (let [log (first (db/select ds ["select * from logs where id =?" id]))
               tags (db/select ds ["select id, tag from tags, log_tags 
-where tags.id = log_tags.tag_id and log_tags.log_id = ?" id])]
-          (println "tags:" tags)
-          (assoc log "tags" tags)
-          ))
+                                   where tags.id = log_tags.tag_id 
+                                   and log_tags.log_id = ?" id])]
+          (assoc log "tags" tags)))
   ([id target] (rs/tiles target {"log" (select-log id) "id" id}))
   )
 
