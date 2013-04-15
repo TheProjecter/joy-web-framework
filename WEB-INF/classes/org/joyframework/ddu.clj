@@ -24,8 +24,7 @@
   (let [d (dt/today)]
     [(dt/year d) (dt/month d) (dt/day d)]))
 
-(defn- rs-to-map [rs]
-  (reduce (fn [r [k v]] (conj r {(name k) v})) {} rs))
+;;(defn- rs-to-map [rs] (reduce (fn [r [k v]] (conj r {(name k) v})) {} rs))
 
 (defn- get-logs-created-in [year month]
   (rs/tiles "logs"
@@ -90,12 +89,16 @@
   (db/select ds ["select * from tags"]))
 
 (defn edit [_ id]
-  (let [log (select-log id) all-tags (select-tags) ]
-    (rs/tiles "log-edit" {"log" log "tags" all-tags})
+  (let [log (select-log id) all-tags (select-tags)
+        tags (map #(reduce (fn [x y] (if (x "checked") x
+                                         (if (= (x "id") (y "id"))
+                                           (assoc x "checked" true) x))) %
+                                           (log "tags"))
+                  all-tags)]
+    ;;(println "tags:" tags)
+    (rs/tiles "log-edit" {"log" log "tags" tags})
     ) 
   )
-
-
 
 (defn GET-tags []
   (rs/tiles "tags" {"tags" (select-tags)}))
@@ -132,16 +135,4 @@
       (sql/delete-rows "logs" ["id=?" id]))
     (GET-logs year month)
     )
-  )
-
-(defn select []
-;  (sql/with-connection {:datasource ds}
-;;    (sql/with-query-results res ["select * from logs"]
-;;      (println (map db/foo res))
-;;      )
-;;    )
-;;  (println (db/select {:datasource ds} ["select * from logs"]))
-  (let [rs (db/select ds ["select * from logs"])]
-    (println "rs==>" rs)
-    ) 
   )
