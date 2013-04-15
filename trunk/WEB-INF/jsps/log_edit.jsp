@@ -21,7 +21,21 @@
     <tr>
       <td>${res['tags']}</td>
       <td >
-        
+        <table>
+        <c:forEach items='${tags}' var='t' varStatus='vs' >
+        <c:if test='${vs.index % 4 == 0}' ><tr></c:if>
+        <td width='80'><input type='checkbox' value='${t['id']}'
+                              ${t['checked'] ? 'checked' : ''}>${t['tag']}</input></td>
+        <c:choose>
+        <c:when test='${vs.index % 4 == 3}'></tr></c:when>
+        <c:when test='${vs.last}'>
+        <c:forEach begin='0' end='${4 - vs.index % 4 - 2}'>
+        <td>&nbsp;</td>
+        </c:forEach></tr>
+        </c:when>
+        </c:choose>
+        </c:forEach>
+        </table>
       </td>
     </tr>
     <tr>
