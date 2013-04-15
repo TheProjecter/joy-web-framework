@@ -24,7 +24,7 @@
         <table>
         <c:forEach items='${tags}' var='t' varStatus='vs' >
         <c:if test='${vs.index % 4 == 0}' ><tr></c:if>
-        <td width='80'><input type='checkbox' value='${t['id']}'
+        <td width='80'><input type='checkbox' value='${t['id']}' name='tag'
                               ${t['checked'] ? 'checked' : ''}>${t['tag']}</input></td>
         <c:choose>
         <c:when test='${vs.index % 4 == 3}'></tr></c:when>
