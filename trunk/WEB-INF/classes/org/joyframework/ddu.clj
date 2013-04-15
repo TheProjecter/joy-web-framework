@@ -24,13 +24,10 @@
   (let [d (dt/today)]
     [(dt/year d) (dt/month d) (dt/day d)]))
 
-;;(defn- rs-to-map [rs] (reduce (fn [r [k v]] (conj r {(name k) v})) {} rs))
-
 (defn- get-logs-created-in [year month]
   (rs/tiles "logs"
             {"logs" (db/select ds ["select * from logs where year = ? and month = ?"
-                                   year month]) "year" year "month" month})
-  )
+                                   year month]) "year" year "month" month}))
 
 (defn- get-logs-created-between [{starty :year startm :month}
                                  {endy :year endm :month}])
@@ -60,45 +57,48 @@
 (defn GET-log [id]
   (try
     (if (<= (Integer/parseInt id) 0)
-      (rs/tiles "log-edit" {"id" 0})
+      (rs/tiles "log-edit" {"id" 0 "tags" (select-tags)})
       (select-log id "log"))
     (catch Exception ex (.printStackTrace ex))
     )
   )
 
 (defn- next-id []
-  (sql/with-connection {:datasource ds}
-    (sql/with-query-results [m] ["call next value for seq"]
-      (first (vals m))
-      )))
+  (first (vals (first (db/select ds ["call next value for seq"])))))
+
+(defn- log-from-request [id]
+  (let [insert? (<= (Integer/parseInt id) 0)
+        tid (if insert? (next-id) id)
+        tags (servlet/param "tag")
+        checked-tags (if (string? tags) [tags] tags)]
+    [insert?
+     {:title (servlet/param "title") :content (servlet/param "content") :id tid}
+     (map #(vector tid %) checked-tags)]))
 
 (defn POST-log [id]
-  (let [title (servlet/param "title") content (servlet/param "content")
-        insert? (<= (Integer/parseInt id) 0) tid (if insert? (next-id) id)]
+  (let [[insert? log tags] (log-from-request id)]
     (sql/with-connection {:datasource ds}
       (if insert?
-        (let [[year month date] (today)]
-          (sql/insert-record "logs" {:id tid :title title :content content
-                                     :year year :month month :date date}))
-        (sql/update-values "logs" ["id=?" tid] {:title title :content content}))
-      )
-    (select-log tid "log"))
-  )
+        (let [[y m d] (today)]
+          (sql/insert-record "logs" (assoc log :year y :month m :date d)))
+        (let [id (:id log)]
+          (sql/update-values "logs" ["id=?" id] log)
+          (sql/delete-rows "log_tags" ["log_id=?" id])))
+      (if (< 0 (count tags))
+        (apply sql/insert-rows "log_tags" tags)))
+    )
+  (select-log id "log"))
 
 (defn- select-tags []
   (db/select ds ["select * from tags"]))
 
 (defn edit [_ id]
-  (let [log (select-log id) all-tags (select-tags)
+  (let [log (select-log id)
         tags (map #(reduce (fn [x y] (if (x "checked") x
                                          (if (= (x "id") (y "id"))
                                            (assoc x "checked" true) x))) %
-                                           (log "tags"))
-                  all-tags)]
-    ;;(println "tags:" tags)
-    (rs/tiles "log-edit" {"log" log "tags" tags})
-    ) 
-  )
+                                           (log "tags")) (select-tags))]
+    (rs/tiles "log-edit" {"log" log "tags" tags "id" id})))
 
 (defn GET-tags []
   (rs/tiles "tags" {"tags" (select-tags)}))
