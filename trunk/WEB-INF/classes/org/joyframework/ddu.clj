@@ -49,8 +49,6 @@
   (get-logs-created-in (servlet/param "year") (servlet/param "month"))
   )
 
-;;(defn- get-log [id target] (rs/tiles target {"log" (rs-to-map (get-log* id)) "id" id}))
-
 (defn- select-log
   ([id] (let [log (first (db/select ds ["select * from logs where id =?" id]))
               tags (db/select ds ["select id, tag from tags, log_tags 
@@ -88,22 +86,23 @@
     (select-log tid "log"))
   )
 
-(defn edit [_ id] (select-log id "log-edit"))
+(defn- select-tags []
+  (db/select ds ["select * from tags"]))
 
-(defn GET-tags []
-  (sql/with-connection {:datasource ds}
-    (sql/with-query-results tags ["select * from tags"]
-      (rs/tiles "tags" {"tags" (map #(rs-to-map %) tags)})
-      )
-    )
+(defn edit [_ id]
+  (let [log (select-log id) all-tags (select-tags) ]
+    (rs/tiles "log-edit" {"log" log "tags" all-tags})
+    ) 
   )
 
+
+
+(defn GET-tags []
+  (rs/tiles "tags" {"tags" (select-tags)}))
+
 (defn GET-tag [id]
-  (sql/with-connection {:datasource ds}
-    (sql/with-query-results [t] ["select * from tags where id = ?" id]
-      (rs/tiles "tag" {"tag" (rs-to-map t) "id" id})      
-      )
-    )
+  (let [t (first (db/select ds ["select * from tags where id=?" id]))]
+    (rs/tiles "tag" {"tag" t}))
   )
 
 (defn POST-tag [id]
