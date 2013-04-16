@@ -25,14 +25,25 @@
     [(dt/year d) (dt/month d) (dt/day d)]))
 
 (defn- get-logs-created-in [year month]
-  (rs/tiles "logs"
-            {"logs" (db/select ds ["select * from logs where year = ? and month = ?"
-                                   year month]) "year" year "month" month}))
+  (let [current-page (or (servlet/param "page") "1")
+
+        total (first (vals (first (db/select ds ["select count(*) from logs where 
+                                                  year=? and month=?" year month]))))
+        per-page 7
+        start (* per-page (- (Integer/parseInt current-page) 1))
+
+        k (+ start per-page) end (if (>= k total) total k) 
+
+        pages (+ 1 (quot total per-page))
+        logs (db/select ds ["select * from logs where
+                             year=? and month=?" year month])]
+    (rs/tiles "logs" {"logs" (subvec logs start end) "pages" pages}))
+  )
 
 (defn- get-logs-created-between [{starty :year startm :month}
                                  {endy :year endm :month}])
 
-(defn GET-logs
+(defn GET-logs "url: /joy/logs/2013/4?page=1"
   ([] (let [[year month] (today)]
         (get-logs-created-in year month)))
   ([year]
