@@ -54,6 +54,9 @@
   ([id target] (rs/tiles target {"log" (select-log id) "id" id}))
   )
 
+(defn- select-tags []
+  (db/select ds ["select * from tags"]))
+
 (defn GET-log [id]
   (try
     (if (<= (Integer/parseInt id) 0)
@@ -89,8 +92,7 @@
     )
   (select-log id "log"))
 
-(defn- select-tags []
-  (db/select ds ["select * from tags"]))
+
 
 (defn edit [_ id]
   (let [log (select-log id)
