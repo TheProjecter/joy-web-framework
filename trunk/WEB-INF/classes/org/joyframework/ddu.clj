@@ -24,25 +24,36 @@
   (let [d (dt/today)]
     [(dt/year d) (dt/month d) (dt/day d)]))
 
+(defn- pages [page total per-page]
+  (let [last-page (+ (if (= 0 (mod total per-page)) 0 1) (quot total per-page))]
+    (if (and (>= page 1) (<= page last-page))
+      (let [page-groups (partition 5 5 nil (range 1 (+ 1 last-page)))
+            pages (some #(if (<= page (last %)) % false) page-groups)
+            more? (< page (first (last page-groups)))
+            prev? (> page (last (first page-groups)))]
+        {:pages pages :page page :last-page last-page
+         :more (if more? (+ 1 (last pages)) 0)
+         :prev (if prev? (- (first pages) 1) 0)
+         :start (* per-page (- page 1))}
+        )
+      )
+    )
+  )
+
 (defn- get-logs-created-in [year month]
-  (let [page (Integer/parseInt (or (servlet/param "page") "1"))
-        total (first (vals (first (db/select ds ["select count(*) from logs where 
-                                                  year=? and month=?" year month]))))
-        per-page 10
-        last-page (+ (if (= 0 (mod total per-page)) 0 1) (quot total per-page))]
-    (if (or (< page 1) (> page last-page)) (rs/not-found)
-        (let [page-groups (partition 5 5 nil (range 1 (+ 1 last-page)))
-              pages (some #(if (<= page (last %)) % false) page-groups)
-              more? (< page (first (last page-groups)))
-              prev? (> page (last (first page-groups)))
-              sql (str "select limit " (* per-page (- page 1)) " "
-                       per-page " * from logs where year=? and month=?")]
-          (rs/tiles "logs" {"logs" (db/select ds [sql year month])
-                            "pages" pages
-                            "more" (if more? (+ 1 (last pages)) 0)
-                            "prev" (if prev? (- (first pages) 1) 0)
-                            "page" page})
-          ))
+  (let [per-page 3]
+    (if-let [{:keys [pages more prev page start]}
+             (pages (Integer/parseInt (or (servlet/param "page") "1"))
+                    (first (vals
+                            (first
+                             (db/select ds ["select count(*) from logs where 
+                                             year=? and month=?" year month]))))
+                    per-page)]
+      (let [sql (str "select limit " start " " per-page
+                     " * from logs where year=? and month=?")]
+        (rs/tiles "logs" {"logs" (db/select ds [sql year month])
+                          "pages" pages "more" more "prev" prev "page" page}))
+      (rs/not-found))
     ))
 
 (defn- get-logs-created-between [{starty :year startm :month}
