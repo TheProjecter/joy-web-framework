@@ -60,8 +60,11 @@
 
 (defn param
   "Retrieves the value HTTP request parameter by the given name." 
-  [name]
-  (*http-params* name))
+  ([name] (*http-params* name))
+  ([name val]
+     (let [p (*http-params* name)]
+       (if (< 0 (count p)) p val)
+       )))
 
 (defn GET? [] (= "GET" *http-method*))
 

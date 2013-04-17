@@ -20,6 +20,9 @@
 
 (defn index [] (rs/tiles "index"))
 
+(defn- select-tags []
+  (db/select ds ["select * from tags"]))
+
 (defn- today []
   (let [d (dt/today)]
     [(dt/year d) (dt/month d) (dt/day d)]))
@@ -35,13 +38,11 @@
          :more (if more? (+ 1 (last pages)) 0)
          :prev (if prev? (- (first pages) 1) 0)
          :start (* per-page (- page 1))}
-        )
-      )
-    )
-  )
+        ))
+    ))
 
 (defn- get-logs-created-in [year month]
-  (let [per-page 3]
+  (let [per-page 4]
     (if-let [{:keys [pages more prev page start]}
              (pages (Integer/parseInt (or (servlet/param "page") "1"))
                     (first (vals
@@ -62,14 +63,39 @@
 (defn GET-logs "url: /joy/logs/2013/4?page=1"
   ([] (let [[year month] (today)]
         (get-logs-created-in year month)))
-  ([year]
-     (get-logs-created-in year (dt/month (dt/today))))
+  ([arg]
+     (if (= "search" arg)
+       (rs/tiles "logs-search" {"tags" (select-tags)})
+       (get-logs-created-in arg (dt/month (dt/today))))
+     )
   ([year month]
      (get-logs-created-in year month))
   )
 
-(defn POST-logs []
-  (get-logs-created-in (servlet/param "year") (servlet/param "month"))
+(defn POST-logs
+  ([] (get-logs-created-in (servlet/param "year") (servlet/param "month")))
+  ([arg]
+     (if (= "search" arg)
+       (let [year (servlet/param "year" nil) month (servlet/param "month" nil)
+             title (servlet/param "title" nil) tag (servlet/param "tag" nil)
+             sql (str "select * from logs "
+                      (if (or year month title tag) "where ")
+                      (if year "year=? ")
+                      (if month (str (if year "and ") "month=? "))
+                      (if title (str (if (or year month) "and ") "title like ? "))
+                      (if tag (str (if (or year month title) "and ")
+                                   "id in (select distinct lts.log_id from 
+                                             log_tags lts, tags ts where 
+                                             lts.tag_id = ts.id and ts.id in (?))")))
+             tags (if (string? tag) tag (if tag (reduce #(str % "," %2) tag)))
+             q (vec (filter #(not (nil? %))
+                            [sql (if year year) (if month month)
+                             (if title (str title "%")) (if tags tags)]))
+             ]
+         (rs/tiles "logs-search-done" {"logs" (db/select ds q)
+                                       "tags" (select-tags)} ))
+       (rs/not-found))
+     )
   )
 
 (defn- select-log
@@ -80,9 +106,6 @@
           (assoc log "tags" tags)))
   ([id target] (rs/tiles target {"log" (select-log id) "id" id}))
   )
-
-(defn- select-tags []
-  (db/select ds ["select * from tags"]))
 
 (defn GET-log [id]
   (try

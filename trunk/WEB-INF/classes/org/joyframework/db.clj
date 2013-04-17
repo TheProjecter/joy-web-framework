@@ -49,3 +49,13 @@
     (sql/with-query-results res query
       (vec (map foo res))
       )))
+
+(defn insert [db sql]
+
+  )
+
+(defn update [db sql])
+
+(defn delete [db sql])
+
+
