@@ -3,15 +3,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix='fmt' uri='http://java.sun.com/jsp/jstl/fmt' %>
 
-<table>
+<table width='100%' border='1'>
   <tr>
     <form method='post' action='/ddu/joy/logs?page=1' >
       <td width='60'><input name='year' size='5' value='${year}' /></td>
       <td width='40'><input name='month' size='3' value='${month}' /></td>
-      <td width='80'><input type='submit' value='${res['search']}' /></td>
+      <td width='140'><input type='submit' value='${res['search']}' /></td>
     </form>
-    <td align='right' width='400'>
-    <table border='1' width='360'>
+    <td align='right' >
+    <table border='1' width='300'>
     <tr>
     <c:if test='${prev > 0}'>
       <td width='40'><a href='/ddu/joy/logs?page=${prev}'>${res['prev']}</a></td>
