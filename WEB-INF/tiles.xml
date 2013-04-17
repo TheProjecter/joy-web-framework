@@ -27,6 +27,14 @@
     <put-attribute name="body" value="/WEB-INF/jsps/log_edit.jsp" />
   </definition>
 
+  <definition name="logs-search" extends="index">
+    <put-attribute name="toolbar" value="/WEB-INF/jsps/logs-search.jsp" />
+  </definition>
+
+  <definition name="logs-search-done" extends="logs-search">
+    <put-attribute name="body" value="/WEB-INF/jsps/logs.jsp" />
+  </definition>
+
   <definition name="tags" extends="logs">
     <put-attribute name='body' value='/WEB-INF/jsps/tags.jsp' />
   </definition>
