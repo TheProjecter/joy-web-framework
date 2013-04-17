@@ -25,16 +25,24 @@
     [(dt/year d) (dt/month d) (dt/day d)]))
 
 (defn- get-logs-created-in [year month]
-  (let [current-page (or (servlet/param "page") "1")
+  (let [page (Integer/parseInt (or (servlet/param "page") "1"))
         total (first (vals (first (db/select ds ["select count(*) from logs where 
                                                   year=? and month=?" year month]))))
-        per-page 5
-        start (* per-page (- (Integer/parseInt current-page) 1))
-        sql (str "select limit " start " " per-page
-                 " * from logs where year=? and month=?")]
-    (rs/tiles "logs" {"logs" (db/select ds [sql year month])
-                      "pages" (+ 1 (quot total per-page))
-                      "currentPage" current-page})
+        per-page 10
+        last-page (+ (if (= 0 (mod total per-page)) 0 1) (quot total per-page))]
+    (if (or (< page 1) (> page last-page)) (rs/not-found)
+        (let [page-groups (partition 5 5 nil (range 1 (+ 1 last-page)))
+              pages (some #(if (<= page (last %)) % false) page-groups)
+              more? (< page (first (last page-groups)))
+              prev? (> page (last (first page-groups)))
+              sql (str "select limit " (* per-page (- page 1)) " "
+                       per-page " * from logs where year=? and month=?")]
+          (rs/tiles "logs" {"logs" (db/select ds [sql year month])
+                            "pages" pages
+                            "more" (if more? (+ 1 (last pages)) 0)
+                            "prev" (if prev? (- (first pages) 1) 0)
+                            "page" page})
+          ))
     ))
 
 (defn- get-logs-created-between [{starty :year startm :month}
@@ -99,8 +107,6 @@
         (apply sql/insert-rows "log_tags" tags)))
     )
   (select-log id "log"))
-
-
 
 (defn edit [_ id]
   (let [log (select-log id)

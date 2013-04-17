@@ -13,12 +13,18 @@
     <td align='right' width='400'>
     <table border='1' width='360'>
     <tr>
-    <c:forEach begin='1' end='${pages}' var='page' varStatus='vs'>
+    <c:if test='${prev > 0}'>
+      <td width='40'><a href='/ddu/joy/logs?page=${prev}'>${res['prev']}</a></td>
+    </c:if>
+    <c:forEach items='${pages}' var='page' varStatus='vs'>
     <td width='30'>
       <a href='/ddu/joy/logs?page=${page}'>${page}</a>
     </td>
     </c:forEach>
-    <td>&nbsp;</td></tr>
+    <td>
+      <c:if test='${more > 0}'><a href='/ddu/joy/logs?page=${more}'>${res['more']}</a></c:if>
+      &nbsp;
+    </td></tr>
     </table>
     </td>
   </tr>
