@@ -15,7 +15,7 @@
   </definition>
 
   <definition name="logs" extends="t">
-    <put-attribute name="toolbar" value='/WEB-INF/jsps/logs_toolbar.jsp' />
+    <put-attribute name="toolbar" value='/WEB-INF/jsps/logs-toolbar.jsp' />
     <put-attribute name="body" value="/WEB-INF/jsps/logs.jsp" />
   </definition>
 
