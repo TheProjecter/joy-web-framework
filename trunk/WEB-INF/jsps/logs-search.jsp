@@ -1,7 +1,7 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<form method='post' action='/ddu/joy/logs/search'>
+<form method='post' action='/ddu/joy/logs'>
   <table border='1' width='500'>
     <tr>
       <td width='80'>${res['year']}</td>
