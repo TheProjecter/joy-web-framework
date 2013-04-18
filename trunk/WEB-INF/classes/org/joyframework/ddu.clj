@@ -23,6 +23,52 @@
 (defn- select-tags []
   (db/select ds ["select * from tags"]))
 
+;; GET /ddu/joy/logs?search
+;; POST /ddu/joy/logs p: year/month/date/title/tags
+
+;; GET /ddu/joy/logs
+;; GET /ddu/joy/logs/2013
+;; GET /ddu/joy/logs/2013/4
+
+;; GET /ddu/joy/logs?page=2
+;; GET /ddu/joy/logs/2013?page=2
+;; GET /ddu/joy/logs/2013/4?page=2
+
+(defn select-logs
+  ([] (select-logs 10))
+  ([per-page]
+     (let [y (servlet/param "year" nil) m (servlet/param "month" nil)
+           d (servlet/param "date" nil) t (servlet/param "title" nil)
+           tag (servlet/param "tag" nil) p (servlet/param "page" 1)]
+       (select-logs y m d t
+                    (if (string? tag) tag (if tag (reduce #(str % "," %2) tag)))
+                    p per-page)
+       )
+     )
+  ([y m d t tags page per-page]
+     (let [sql-count "select count(*) from logs "
+           wh (if (or y m d t tags)
+                (str "where "
+                     (if y "year=? ") (if m (str (if y "and ") "month=? "))
+                     (if d (str (if (or y m) "and ") "date=? "))
+                     (if t (str (if (or y m d) "and ") "title like ? "))
+                     (if tags (str (if (or y m d t) "and ")
+                                   "id in (select distinct lts.log_id from log_tags lts, 
+                                    tags ts where lts.tag_id = ts.id and ts.id in (?))")))
+                  )
+           ;;_ (println "wh =>" wh)
+
+           args (vec (filter #(not (nil? %)) [(str sql-count wh)  y m d t tags])) 
+           _ (println "args =>" args)
+
+           total (first (vals (first (db/select ds args))))
+           _ (println "total =>" total)
+           ]
+
+       )
+     ) 
+  )
+
 (defn- today []
   (let [d (dt/today)]
     [(dt/year d) (dt/month d) (dt/day d)]))
