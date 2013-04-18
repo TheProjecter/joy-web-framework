@@ -41,15 +41,16 @@
     ))
 
 (defn select-logs* [{:keys [wh args page]}]
+  (println "wh =>" wh ", args =>" args)
   (let [per-page 3
         sql-count (str "select count(*) from logs " wh)
-        total (first (vals (first (db/select ds (into [sql-count] args)))))
-        page-info (pages page total per-page)
-        sql-logs (str "select "
-                      (if (>= page 0)
-                        (str "limit " (:start page-info) " " per-page " "))
-                      "* from logs " wh)]
-    (assoc page-info :logs (db/select ds (into [sql-logs] args)))
+        total (first (vals (first (db/select ds (into [sql-count] args)))))]
+    (if-let [page-info (pages page total per-page)]
+      (assoc page-info
+        :logs (db/select ds (into [(str "select limit "
+                                        (:start page-info) " " per-page " "
+                                        "* from logs " wh)] args))))
+    {:logs []}
     ))
 
 ;; GET /ddu/joy/logs?search
@@ -78,10 +79,11 @@
                      (if d (str (if (or y m) "and ") "date=? "))
                      (if t (str (if (or y m d) "and ") "title like ? "))
                      (if tags (str (if (or y m d t) "and ")
-                                   "id in (select distinct lts.log_id 
-                                    from log_tags lts, tags ts where 
-                                    lts.tag_id = ts.id and ts.id in (" tags "))"))))
-           args (vec (filter #(not (nil? %)) [y m d t]))]
+                                   "id in (select distinct lts.log_id from log_tags lts, 
+                                    tags ts where lts.tag_id = ts.id and ("
+                                   (reduce #(str % " or " %2) (for [_ tags] (str "ts.id=?")))
+                                   "))"))))
+           args (into (vec (filter #(not (nil? %)) [y m d t])) tags)]
        (servlet/session-set {"wh" wh "args" args})
        (select-logs wh args page)
        ))
@@ -104,10 +106,10 @@
   )
 
 (defn POST-logs []
-  (let [tag (servlet/param "tag")]
+  (let [tag (servlet/param "tag" nil)]
     (select-logs (servlet/param "year" nil) (servlet/param "month" nil)
                  (servlet/param "date" nil) (servlet/param "title" nil)
-                 (if (string? tag) tag (if tag (reduce #(str % "," %2) tag)))
+                 (if-not (nil? tag) (if (string? tag) [tag] (vec tag)))
                  "1")))
 
 (defn- select-log
