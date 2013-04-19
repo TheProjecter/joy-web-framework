@@ -1,36 +1,35 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.result
-  (:use [org.joyframework servlet] )
+  ;;(:use [org.joyframework servlet] )
+  (:require [org.joyframework.session :as sess]
+            [org.joyframework.request :as req]
+            [org.joyframework.response :as resp]
+            [org.joyframework.context :as ctxt]
+            [org.joyframework.flash :as flash])
   (:import org.apache.tiles.servlet.context.ServletUtil))
 
 (defn ok
   ([msg] (ok msg "text/html"))
-
   ([msg content-type] (ok msg content-type {} 200))
-
   ([msg content-type headers sc]
-     (let [writer (.getWriter *http-response*)]
-       (doto *http-response*
+       (doto resp/*http-response*
          (.setStatus sc)
          (.setContentType content-type)
          (.setContentLength (.length msg)))
-       (header-set headers)
-       (doto writer
+       (resp/header headers)
+       (doto (resp/writer)
          (.println msg)
          (.flush)
-         (.close))
-       ))
+         (.close)))
   )
 
 (defn error 
   ([sc] (error sc ""))
-
   ([sc msg] (error sc msg {}))
-
   ([sc msg headers]
-     (header-set headers)
-     (.sendError *http-response* sc msg))
+     (resp/header headers)
+     (resp/error sc msg))
   )
 
 (defn to-do
@@ -45,28 +44,25 @@
 (defn redirect
   ([url] (redirect url nil))
   ([url args]
-     (doseq [[n v] args] (flash-set n v))
-     (.sendRedirect *http-response* (.encodeURL *http-response* url)))
+     (doseq [[n v] args] (flash/set n v))
+     (resp/redirect url))
   )
 
 (defn forward
   ([path] (forward path {}))
-
   ([path http-attrs]
-     (doseq [[nm val] http-attrs] (.setAttribute *http-request* nm val))
-     (.. *http-request*
+     (req/set http-attrs)
+     (.. req/*http-request*
          (getRequestDispatcher path)
-         (forward *http-request* *http-response*))) 
+         (forward req/*http-request* resp/*http-response*))) 
   )
 
 (defn tiles
   ([id] (tiles id {}))
-
   ([id http-attrs]
      (let [args (object-array 2)]
-       (aset args 0 *http-request*)
-       (aset args 1 *http-response*)
-       (doseq [[nm val] http-attrs]
-         (.setAttribute *http-request* nm val))
-       (.render (ServletUtil/getContainer *servlet-context*) id args)))
+       (aset args 0 req/*http-request*)
+       (aset args 1 resp/*http-response*)
+       (req/set http-attrs)
+       (.render (ServletUtil/getContainer ctxt/*servlet-context*) id args)))
   )

@@ -4,43 +4,32 @@
   (:require [clojure.string :as str]
             ))
 
-(def ^:dynamic *http-method*)
+;;(def ^:dynamic *http-method*)
+;;(def ^:dynamic *http-request*)
+;;(def ^:dynamic *http-response*)
+;;(def ^:dynamic *http-params*)
+;;(def ^:dynamic *http-suffix*)
+;;(def ^:dynamic *http-session*)
 
-(def ^:dynamic *http-request*)
+;;(defn params
+;;  "Gets the HTTP request parameters map."
+;;  [request]
+;;  (let [params (.getParameterMap request)]
+;;    (into {} (for [[k v] params]
+;;               [k (if (== 1 (alength v)) (aget v 0) v)]))
+;;    ))
 
-(def ^:dynamic *http-response*)
-
-(def ^:dynamic *http-params*)
-
-(def ^:dynamic *http-suffix*)
-
-(def ^:dynamic *http-session*)
-
-(def ^:dynamic *servlet-context*)
-
-(def INDEX (symbol "index"))
-
-(def ^:private FLASH_SCOPE_KEY "__flash_ky__")
-
-(defn params
-  "Gets the HTTP request parameters map."
-  [request]
-  (let [params (.getParameterMap request)]
-    (into {} (for [[k v] params]
-               [k (if (== 1 (alength v)) (aget v 0) v)]))
-    ))
-
-(defn servlet-context-attr
-  (
-   [name]
-     "Gets the value of the named attribute from ServletContext."
-     (.getAttribute *servlet-context* name))
-
-  (
-   [name value]
-     "Sets the value of the named attribute in ServletContext."
-     (.setAttribute *servlet-context* name value))
-  )
+;;(defn servlet-context-attr
+;;  (
+;;   [name]
+;;     "Gets the value of the named attribute from ServletContext."
+;;     (.getAttribute *servlet-context* name))
+;;
+;;  (
+;;   [name value]
+;;     "Sets the value of the named attribute in ServletContext."
+;;     (.setAttribute *servlet-context* name value))
+;;  )
 
 ;;(defn session-attr
 ;;  ([name] ""
@@ -58,67 +47,53 @@
 ;;       Integer (.setIntHeader *http-response* val)
 ;;       (.setHeader *http-response* val))))
 
-(defn param
-  "Retrieves the value HTTP request parameter by the given name." 
-  ([name] (*http-params* name))
-  ([name val]
-     (let [p (*http-params* name)]
-       (if (< 0 (count p)) p val)
-       )))
+;;(defn param
+;;  "Retrieves the value HTTP request parameter by the given name." 
+;;  ([name] (*http-params* name))
+;;  ([name val]
+;;     (let [p (*http-params* name)]
+;;       (if (< 0 (count p)) p val)
+;;       )))
 
-(defn GET? [] (= "GET" *http-method*))
+;;(defn GET? [] (= "GET" *http-method*))
 
-(defn POST? [] (= "POST" *http-method*))
+;;(defn POST? [] (= "POST" *http-method*))
 
-(defn session-set
-  "Sets the value into the session scope under the given name."
-  ([attrs] (doseq [[n v] attrs] (session-set n v)))
-  ([name val] (.setAttribute *http-session* name val))
-  )
+;;(defn session-set
+;;  "Sets the value into the session scope under the given name."
+;;  ([attrs] (doseq [[n v] attrs] (session-set n v)))
+;;  ([name val] (.setAttribute *http-session* name val))
+;;  )
+;;
+;;(defn session-get
+;;  "Gets the value from the session scope under the given name."
+;;  [name] (.getAttribute *http-session* name))
+;;
+;;(defn session-invalidate []
+;;  (.invalidate *http-session*))
+;;
+;;(defn request-set "Sets the value into the HTTP request attributes."
+;;  ([attrs] (doseq [[n v] attrs] (if v (request-set n v))))
+;;  ([name val] (.setAttribute *http-request* name val))
+;;  )
+;;
+;;(defn request-get "Gets the value from the HTTP request scope."
+;;  [name] (.getAttribute *http-request* name))
 
-(defn session-get
-  "Gets the value from the session scope under the given name."
-  [name] (.getAttribute *http-session* name))
 
-(defn session-invalidate []
-  (.invalidate *http-session*))
+;;(defn flash-get "" [name])
 
-(defn request-set "Sets the value into the HTTP request attributes."
-  ([attrs] (doseq [[n v] attrs] (if v (request-set n v))))
-  ([name val] (.setAttribute *http-request* name val))
-  )
-
-(defn request-get "Gets the value from the HTTP request scope."
-  [name] (.getAttribute *http-request* name))
-
-(defn flash-set ""
-  ([attrs]
-     (doseq [[n v] attrs] (flash-set n v)))
-  ([name val]
-     (let [fs (or (session-get FLASH_SCOPE_KEY) {})]
-       (session-set FLASH_SCOPE_KEY (assoc fs name val))))
-  )
-
-(defn flash-get ""
-  [name])
-
-(defn reinstate-flash
-  "Move flash scoped parames into the request and clear the session."
-  []
-  (request-set (session-get FLASH_SCOPE_KEY))
-  (session-set FLASH_SCOPE_KEY nil))
-
-(defn header-get ""
-  [name] (.getHeader *http-request* name))
-
-(defn header-set
-  ""
-  ([headers] (doseq [[n v] headers] (header-set n v)))
-  ;;(map #(header-set (key %) (val %)) headers)
-  ([name val]
-     (condp instance? val
-       Long (.setDateHeader *http-response* name val)
-       Integer (.setIntHeader *http-response* name val)
-       (.setHeader *http-response* name val))) 
-  )
+;;(defn header-get ""
+;;  [name] (.getHeader *http-request* name))
+;;
+;;(defn header-set
+;;  ""
+;;  ([headers] (doseq [[n v] headers] (header-set n v)))
+;;  ;;(map #(header-set (key %) (val %)) headers)
+;;  ([name val]
+;;     (condp instance? val
+;;       Long (.setDateHeader *http-response* name val)
+;;       Integer (.setIntHeader *http-response* name val)
+;;       (.setHeader *http-response* name val))) 
+;;  )
 

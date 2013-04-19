@@ -1,28 +1,35 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.route
-  (:use [org.joyframework servlet resources validation] )
+  (:use [org.joyframework resources validation] )
   (:require [clojure.string :as str]
-            [org.joyframework.result :as r])
+            [org.joyframework.result :as r]
+            [org.joyframework.session :as sess]
+            [org.joyframework.request :as req]
+            [org.joyframework.response :as resp]
+            [org.joyframework.context :as ctxt]
+            [org.joyframework.flash :as flash]
+            [org.joyframework.util :as util])
   (:import java.io.FileNotFoundException))
 
 (def ^:dynamic *bootstraps* "Mappings in the bootstrap namespace.")
 
-(declare get-request-path get-route get-handler get-handler-from-path
-         checkbox validate valid-http-method? valid-token? invoke trim-slashes)
+(def INDEX (symbol "index"))
+
+(declare get-route get-handler get-handler-from-path
+         checkbox validate valid-http-method? valid-token? invoke)
 
 (defn service
   ""
   [bss request response]
   (binding [*bootstraps* bss
-            *http-request* request
-            *http-method* (.getMethod request)
-            *http-response* response
-            *http-params* (params request)
-            *http-session* (.getSession request)
-            *servlet-context* (.. request getSession getServletContext)]
-    (let [[handler args ns] (-> (get-request-path) get-route get-handler)]
-      (reinstate-flash)
+            resp/*http-response* response
+            req/*http-request* request
+            req/*http-params* (req/params request)
+            sess/*http-session* (.getSession request)
+            ctxt/*servlet-context* (.. request getSession getServletContext)]
+    (let [[handler args ns] (-> (req/path) get-route get-handler)]
+      (flash/reinstate)
       (try
         (if handler
           (doto handler
@@ -38,7 +45,7 @@
 (defn- valid-http-method? ""
   [handler]
   (let [m (meta handler)]
-    (if-not (cond (:GET m) (GET?) (:POST m) (POST?) :else true)
+    (if-not (cond (:GET m) (req/GET?) (:POST m) (req/POST?) :else true)
       (throw (RuntimeException. "invalid.http.method")))
     ))
 
@@ -47,10 +54,10 @@
    can be invoked; otherwise false returned. "
   [handler]
   (if (:token (meta handler))
-       (let [tn (session-get "__jf_tk_name__")
-          tv (session-get "__jf_tk_value__")]
-      (session-set "__jf_tk_name__" nil)
-      (if-not (= (param tn) tv)
+       (let [tn (sess/get "__jf_tk_name__")
+          tv (sess/get "__jf_tk_value__")]
+      (sess/set "__jf_tk_name__" nil)
+      (if-not (= (req/param tn) tv)
         (throw (RuntimeException. "invalid.token")))
       )
     )
@@ -60,10 +67,10 @@
   (let [chks
         (reduce (fn [m [k v]]
                   (let [kn (name k) n (.substring kn 5)]
-                    (if (nil? (param n)) (assoc m n v) m))) {}
+                    (if (nil? (req/param n)) (assoc m n v) m))) {}
                 (filter (fn [[k v]]
                           (.startsWith (name k) "_chk_")) (meta handler)))]
-    (set! *http-params* (into *http-params* chks) ))
+    (set! req/*http-params* (into req/*http-params* chks) ))
   )
 
 (defn- validate [handler ns]
@@ -101,29 +108,14 @@
     (if (empty? e)
       (apply handler args)
       (if input (input {"errors" e})
-          (let [p (conj *http-params* {"errors" e})]
+          (let [p (conj req/*http-params* {"errors" e})]
             (cond redirect (r/redirect redirect p)
                   tiles (r/tiles tiles p)
                   forward (r/forward forward p))
             ))
       )))
 
-(defn- get-request-path
-  ""
-  []
-  (let [path-info (or (.getPathInfo *http-request*) "/") 
-        ;;_ (println "path-info:" path-info)
-        servlet-path (.getServletPath *http-request*)
-        ;;_ (println "servlet-path:" servlet-path)
-        ]
-    (str/split
-     (trim-slashes
-      (if path-info path-info
-          (let [i (.lastIndexOf servlet-path ".")]
-            (if (== -1 i) servlet-path
-                (.substring servlet-path 0 i))))
-      ) #"/")
-    ))
+
 
 (defn- get-route
   ""
@@ -137,7 +129,7 @@
   "Finds the proper function to handle the request."
   [{ns :ns path :path}]
   (let [ns-pubs (ns-publics ns)]
-    (if-let [h0 (first (for [[pk pv] ns-pubs [pa _] *http-params*
+    (if-let [h0 (first (for [[pk pv] ns-pubs [pa _] req/*http-params*
                              :when (= (str pk) pa)] pv))]
       [h0 path ns]
       (if-let [h1 (get-handler-from-path path ns-pubs)]
@@ -147,7 +139,7 @@
 
 (defn- get-handler-from-path [path ns-pubs]
   (if-let [fst (first path)]
-    (or (ns-pubs (symbol (str *http-method* "-" fst)))
+    (or (ns-pubs (symbol (str (req/method) "-" fst)))
         (ns-pubs (symbol fst)))))
 
 (defmacro defroutes
@@ -207,7 +199,7 @@
                      path-md (:path md)
                      ;;_ (println "path-md:" path-md)
                      path (or (and path-md
-                                   (str/split (trim-slashes path-md) #"/"))
+                                   (str/split (util/trim-slashes path-md) #"/"))
                               (str/split (str (ns-name %)) #"\."))
                      ;;_ (println "ns:" % ", path:" path) 
                      ]
@@ -217,16 +209,3 @@
          ;;from the last step
          (reduce build-routes-map {})
          )))
-
-(defn- trim-slashes
-  "Trims slashes from both ends of the given string argument."
-  [s]
-  ;;(println "s:" s)
-  (when s
-    (if (= "/" s) s
-        (let [b1 (.startsWith s "/") b2 (.endsWith s "/")]
-          (if (or b1 b2)
-            (let [l (.length s)]
-              (.substring s (if b1 1 0) (if b2 (- l 1) l))) s))
-        )
-    ))
