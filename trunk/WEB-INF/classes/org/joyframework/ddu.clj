@@ -168,9 +168,10 @@
 (defn GET-tags [] (rs/tiles "tags" {"tags" (select-tags)}))
 
 (defn GET-tag [id]
-  (let [t (first (db/select ds ["select * from tags where id=?" id]))]
-    (rs/tiles "tag" {"tag" t})
-    ))
+  (rs/tiles
+   "tag" (if (< 0 (Integer/parseInt id))
+           {"tag" (first (db/select ds ["select * from tags where id=?" id]))})
+   ))
 
 (defn POST-tag [id]
   (let [insert? (<= (Integer/parseInt id) 0)
@@ -185,14 +186,21 @@
 
 (defmulti delete (fn [target _] target))
 
+(defn- delete-log-tags [{:keys [log tag]}]
+  (if-let [wh (cond log ["log_id=?" log]
+                    tag ["tag_id=?" tag])]
+    (sql/delete-rows "log_tags" wh)))
+
 (defmethod delete "tag" [_ id]
   (sql/with-connection {:datasource ds}
-    (sql/delete-rows "tags" ["id=?" id]))
+    (sql/delete-rows "tags" ["id=?" id])
+    (delete-log-tags {:tag id}))
   (GET-tags))
 
 (defmethod delete "log" [_ id]
   (let [{year "year" month "month"} (select-log id)]
     (sql/with-connection {:datasource ds}
-      (sql/delete-rows "logs" ["id=?" id]))
-    (GET-logs year month)
+      (sql/delete-rows "logs" ["id=?" id])
+      (delete-log-tags {:log id}))
+    (GET-logs)
     ))

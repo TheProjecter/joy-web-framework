@@ -35,11 +35,12 @@
     <put-attribute name="body" value="/WEB-INF/jsps/logs.jsp" />
   </definition>
 
-  <definition name="tags" extends="logs">
+  <definition name="tags" extends="index">
+    <put-attribute name="toolbar" value="/WEB-INF/jsps/tags-toolbar.jsp" />    
     <put-attribute name='body' value='/WEB-INF/jsps/tags.jsp' />
   </definition>
 
-  <definition name="tag" extends="logs">
+  <definition name="tag" extends="tags">
     <put-attribute name='body' value='/WEB-INF/jsps/tag.jsp' />
   </definition>
 
