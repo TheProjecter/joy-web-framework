@@ -43,7 +43,7 @@
     ))
 
 (defn select-logs* [{:keys [wh args page]}]
-  (let [per-page 6
+  (let [per-page 3
         sql-count (str "select count(*) from logs " wh)
         total (first (vals (first (db/select ds (into [sql-count] args)))))]
     (if-let [page-info (pages page total per-page)]
@@ -54,26 +54,7 @@
       {:logs []})
     ))
 
-;; GET /ddu/joy/logs?search
-;; POST /ddu/joy/logs p: year/month/date/title/tags
-
-;; GET /ddu/joy/logs
-;; GET /ddu/joy/logs?page=2
-
-;; GET /ddu/joy/logs/2013
-;; GET /ddu/joy/logs/2013/4
-
-;; GET /ddu/joy/logs/2013?page=2
-;; GET /ddu/joy/logs/2013/4?page=2
 (defn select-logs
-  ([] (let [wh (servlet/session-get "wh") args (servlet/session-get "args")
-            all (servlet/param "all")]
-        (if all (select-logs nil)
-            (if (and wh args)
-              (select-logs wh args (servlet/param "page" "1"))))
-        ))
-  ([y] (select-logs y nil))
-  ([y m] (select-logs y m nil nil nil (servlet/param "page" "1")))
   ([y m d t tags page]
      (let [wh (if (or y m d t tags)
                 (str "where "
@@ -99,14 +80,30 @@
        ))
   )
 
+;; GET /ddu/joy/logs?all
+;; GET /ddu/joy/logs?search
+;; POST /ddu/joy/logs p: year/month/date/title/tags
+
+;; GET /ddu/joy/logs
+;; GET /ddu/joy/logs?page=2
+
+;; GET /ddu/joy/logs/2013
+;; GET /ddu/joy/logs/2013/4
+
+;; GET /ddu/joy/logs/2013?page=2
+;; GET /ddu/joy/logs/2013/4?page=2
+
 (defn GET-logs "url: /joy/logs/2013/4?page=1"
-  ([] (select-logs))
-  ([arg]
-     (condp = arg 
-       "search" (rs/tiles "logs-search" {"tags" (select-tags)})
+  ([] (cond
+       (servlet/param "all") (GET-logs nil)
+       (servlet/param "search") (rs/tiles "logs-search" {"tags" (select-tags)})
+       :else (let [wh (servlet/session-get "wh") args (servlet/session-get "args")]
+               (if (and wh args)
+                 (select-logs wh args (servlet/param "page" "1"))
+                 (rs/tiles "logs")))
        ))
-  ([year month]
-     (select-logs year month))
+  ([year] (GET-logs year nil))
+  ([year month] (select-logs year month nil nil nil (servlet/param "page" "1")))
   )
 
 (defn POST-logs []
@@ -153,8 +150,8 @@
           (sql/delete-rows "log_tags" ["log_id=?" id])))
       (if (< 0 (count tags))
         (apply sql/insert-rows "log_tags" tags)))
-    )
-  (select-log id "log"))
+    (select-log (:id log) "log")
+    ))
 
 (defn edit [_ id]
   (let [log (select-log id)
