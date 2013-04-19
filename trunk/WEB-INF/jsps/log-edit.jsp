@@ -15,7 +15,7 @@
     <tr>
       <td>${res['content']}</td>
       <td >
-        <textarea cols='40' rows='20' name='content'>${log["content"]}</textarea>
+        <textarea cols='62' rows='20' name='content'>${log["content"]}</textarea>
       </td>
     </tr>
     <tr>

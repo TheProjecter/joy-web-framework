@@ -44,9 +44,9 @@
         ))
     ))
 
-(defn select-logs* [{:keys [wh args page]}]
+(defn- select-logs* [{:keys [wh args page]}]
   ;;(println "wh ==>" wh ", args ==>" args)
-  (let [per-page 3
+  (let [per-page 15
         sql-count (str "select count(*) from logs " wh)
         total (first (vals (first (db/select ds (into [sql-count] args)))))]
     (if-let [page-info (pages page total per-page)]
@@ -57,7 +57,7 @@
       {:logs []})
     ))
 
-(defn select-logs
+(defn- select-logs
   ([page] (select-logs nil nil nil nil nil page))
   ([y m d t tags page]
      (let [wh (if (or y m d t tags)
