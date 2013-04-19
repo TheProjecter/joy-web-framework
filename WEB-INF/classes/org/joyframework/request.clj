@@ -6,6 +6,7 @@
 
 (def ^:dynamic *http-request*)
 (def ^:dynamic *http-params*)
+(def ^:dynamic *path*)
 
 (defn set
   ([m] (doseq [[n v] m] (set n v)))
@@ -29,11 +30,10 @@
     (into {} (for [[k v] params] [k (if (== 1 (alength v)) (aget v 0) v)]))
     ))
 
-(defn path ""
-  []
-  (let [path-info (or (.getPathInfo *http-request*) "/") 
+(defn path [request]
+  (let [path-info (or (.getPathInfo request) "/") 
         ;;_ (println "path-info:" path-info)
-        servlet-path (.getServletPath *http-request*)
+        servlet-path (.getServletPath request)
         ;;_ (println "servlet-path:" servlet-path)
         ]
     (str/split
