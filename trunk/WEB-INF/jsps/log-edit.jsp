@@ -40,6 +40,7 @@
     </tr>
     <tr>
       <td colspan='2' align='center'>
+        <button onclick='window.location="/ddu/joy/log/${id}?${all}"' >${res["back"]}</button>
         <input type='submit' name='ok' value='${res["ok"]}' />
       </td>
     </tr>

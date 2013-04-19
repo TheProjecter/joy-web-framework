@@ -7,20 +7,23 @@
   <tr>
     <td width='30'>&nbsp;</td>
     <td >${log['title']}</td>
-    <td width='60'>
-      <a href='/ddu/joy/log/${log['id']}?edit'>${res['edit']}</a>
+    <td width='40'>
+      <a href='/ddu/joy/logs?page=${page}&${all}'>${res['back']}</a>
     </td>
-    <td width='60'>
-      <a href='/ddu/joy/log/${log['id']}?delete'>${res['del']}</a>
+    <td width='40'>
+      <a href='/ddu/joy/log/${log['id']}?edit&page=${page}&${all}'>${res['edit']}</a>
+    </td>
+    <td width='50'>
+      <a href='/ddu/joy/log/${log['id']}?delete&${all}'>${res['del']}</a>
     </td>
   </tr>
   <tr>
-    <td colspan='4'>
+    <td colspan='5'>
       ${log['content']}
     </td>
   </tr>
   <tr>
-    <td colspan='4'>
+    <td colspan='5'>
       <table>
         <c:forEach items='${log["tags"]}' var='t' varStatus='vs'>
         <c:if test='${vs.index % 4 == 0}' ><tr></c:if>

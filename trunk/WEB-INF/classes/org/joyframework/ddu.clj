@@ -119,7 +119,9 @@
                                    where tags.id = log_tags.tag_id 
                                    and log_tags.log_id = ?" id])]
           (assoc log "tags" tags)))
-  ([id target] (rs/tiles target {"log" (select-log id) "id" id}))
+  ([id target] (rs/tiles target {"log" (select-log id) "id" id
+                                 "page" (servlet/param "page")
+                                 "all" (if (servlet/param "all") "all")}))
   )
 
 (defn GET-log [id]
@@ -159,7 +161,8 @@
                                          (if (= (x "id") (y "id"))
                                            (assoc x "checked" true) x))) %
                                            (log "tags")) (select-tags))]
-    (rs/tiles "log-edit" {"log" log "tags" tags "id" id})))
+    (rs/tiles "log-edit" {"log" log "tags" tags "id" id
+                          "all" (if (servlet/param "all") "all")})))
 
 (defn GET-tags [] (rs/tiles "tags" {"tags" (select-tags)}))
 
