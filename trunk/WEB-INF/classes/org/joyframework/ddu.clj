@@ -31,9 +31,7 @@
 (defn- select-tags [] (db/select ds ["select * from tags"]))
 
 (defn- pages [page total per-page]
-  (println "page:" page ", total:" total)
   (let [last-page (+ (if (= 0 (mod total per-page)) 0 1) (quot total per-page))]
-    (println "last-page:" last-page)
     (if (and (>= page 1) (<= page last-page))
       (let [page-groups (partition 5 5 nil (range 1 (+ 1 last-page)))
             pages (some #(if (<= page (last %)) % false) page-groups)
