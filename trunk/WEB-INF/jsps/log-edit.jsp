@@ -6,8 +6,9 @@
   textarea {resize:none;}
 </style>
 
-<table border='1' width='100%'>
-  <form method='post' action='/ddu/joy/log/${id}'>
+<form method='post' action='/ddu/joy/log/${id}'>
+  <input name='__jf_src_page__' value='${__jf_src_page__}' />
+  <table border='1' width='100%'>
     <tr>
       <td width='80'>${res['title']}</td>
       <td ><input name='title' value='${log['title']}' /></td>
@@ -44,5 +45,5 @@
         <input type='submit' name='ok' value='${res["ok"]}' />
       </td>
     </tr>
-  </form>
-</table>
+  </table>
+</form>

@@ -24,11 +24,12 @@
   [bss request response]
   (binding [*bootstraps* bss
             resp/*http-response* response
+            req/*path* (req/path request)
             req/*http-request* request
             req/*http-params* (req/params request)
             sess/*http-session* (.getSession request)
             ctxt/*servlet-context* (.. request getSession getServletContext)]
-    (let [[handler args ns] (-> (req/path) get-route get-handler)]
+    (let [[handler args ns] (get-handler (get-route))]
       (flash/reinstate)
       (try
         (if handler
@@ -117,10 +118,9 @@
 
 
 
-(defn- get-route
-  ""
-  [request-path]
-  (loop [[r & rs :as path] request-path m (var-get ('rt *bootstraps*))]
+(defn- get-route ""
+  []
+  (loop [[r & rs :as path] req/*path* m (var-get ('rt *bootstraps*))]
     (if-let [sub-rt (m r)]
       (recur rs sub-rt) (assoc m :path path)))
   )
