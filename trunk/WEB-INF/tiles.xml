@@ -24,7 +24,7 @@
   </definition>
 
   <definition name="log-edit" extends="logs">
-    <put-attribute name="body" value="/WEB-INF/jsps/log_edit.jsp" />
+    <put-attribute name="body" value="/WEB-INF/jsps/log-edit.jsp" />
   </definition>
 
   <definition name="logs-search" extends="index">
