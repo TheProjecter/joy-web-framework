@@ -8,13 +8,13 @@
     <td width='30'>&nbsp;</td>
     <td >${log['title']}</td>
     <td width='40'>
-      <a href='/ddu/joy/logs?page=${page}&${all}'>${res['back']}</a>
+      <a href='/ddu/joy/logs'>${res['back']}</a>
     </td>
     <td width='40'>
-      <a href='/ddu/joy/log/${log['id']}?edit&page=${page}&${all}'>${res['edit']}</a>
+      <a href='/ddu/joy/log/${log['id']}?edit'>${res['edit']}</a>
     </td>
     <td width='50'>
-      <a href='/ddu/joy/log/${log['id']}?delete&${all}'>${res['del']}</a>
+      <a href='/ddu/joy/log/${log['id']}?delete'>${res['del']}</a>
     </td>
   </tr>
   <tr>

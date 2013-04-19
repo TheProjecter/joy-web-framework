@@ -20,7 +20,7 @@
 (defn param
   ([name] (*http-params* name))
   ([name val] (let [p (param name)] (if p p val)))
-  ([f name & xs] (map (comp f param) (cons name xs)))
+  ([f name & xs] (map (if f (comp f param) param) (cons name xs)))
   )
 
 (defn params "Gets the HTTP request parameters map."

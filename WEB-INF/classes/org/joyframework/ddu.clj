@@ -21,6 +21,9 @@
 
 (defn index [] (rs/tiles "index"))
 
+(defn- page []
+  (if-let [p (req/param "page")] (sess/set "page" p) (sess/get "page" "1")))
+
 (defn- next-id [] (first (vals (first (db/select ds ["call next value for seq"])))))
 
 (defn- today [] (let [d (dt/today)] [(dt/year d) (dt/month d) (dt/day d)]))
@@ -44,7 +47,7 @@
     ))
 
 (defn select-logs* [{:keys [wh args page]}]
-  (println "wh ==>" wh ", args ==>" args)
+  ;;(println "wh ==>" wh ", args ==>" args)
   (let [per-page 3
         sql-count (str "select count(*) from logs " wh)
         total (first (vals (first (db/select ds (into [sql-count] args)))))]
@@ -57,6 +60,7 @@
     ))
 
 (defn select-logs
+  ([page] (select-logs nil nil nil nil nil page))
   ([y m d t tags page]
      (let [wh (if (or y m d t tags)
                 (str "where "
@@ -77,8 +81,7 @@
            (select-logs* {:wh wh :args args :page (Integer/parseInt page)})]
        (rs/tiles
         "logs" {"logs" logs "pages" pages "more" more
-                "prev" prev "page" page
-                "all" (if (req/param "all") "all")})
+                "prev" prev "page" page})
        ))
   )
 
@@ -97,24 +100,26 @@
 
 (defn GET-logs "url: /joy/logs/2013/4?page=1"
   ([] (cond
-       (req/param "all") (GET-logs nil)
        (req/param "search") (rs/tiles "logs-search" {"tags" (select-tags)})
+       (or (req/param "all") (sess/attr? "all")) (do (sess/set "all" true)
+                                                     (select-logs (page)))
        :else (let [wh (sess/get "wh") args (sess/get "args")]
-               (if (and wh args)
-                 (select-logs wh args (req/param "page" "1"))
+               (if (or wh args)
+                 (select-logs wh args (page))
                  (rs/tiles "logs")))
        ))
   ([year] (GET-logs year nil))
-  ([year month] (select-logs year month nil nil nil (req/param "page" "1")))
+  ([year month]
+     (sess/remove "all" "page")
+     (select-logs year month nil nil nil (page)))
   )
 
 (defn POST-logs []
   (let [[year month date title tag]
         (req/param #(if (== 0 (count %)) nil %) "year" "month" "date" "title" "tag")]
-    ;;(println "year:" year ", month: " month ", date:" date ", title:" title)
+    (sess/remove "all" "page")
     (select-logs year month date title
-                 (if-not (nil? tag) (if (string? tag) [tag] (vec tag)))
-                 "1")))
+                 (if-not (nil? tag) (if (string? tag) [tag] (vec tag))) "1")))
 
 (defn- select-log
   ([id] (let [log (first (db/select ds ["select * from logs where id =?" id]))
@@ -122,9 +127,7 @@
                                    where tags.id = log_tags.tag_id 
                                    and log_tags.log_id = ?" id])]
           (assoc log "tags" tags)))
-  ([id target] (rs/tiles target {"log" (select-log id) "id" id
-                                 "page" (req/param "page")
-                                 "all" (if (req/param "all") "all")}))
+  ([id target] (rs/tiles target {"log" (select-log id) "id" id}))
   )
 
 (defn GET-log [id]
@@ -164,8 +167,7 @@
                                          (if (= (x "id") (y "id"))
                                            (assoc x "checked" true) x))) %
                                            (log "tags")) (select-tags))]
-    (rs/tiles "log-edit" {"log" log "tags" tags "id" id
-                          "all" (if (req/param "all") "all")})))
+    (rs/tiles "log-edit" {"log" log "tags" tags "id" id})))
 
 (defn GET-tags [] (rs/tiles "tags" {"tags" (select-tags)}))
 
