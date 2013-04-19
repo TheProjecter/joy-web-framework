@@ -11,7 +11,7 @@
       <td width='140'>
         <input type='submit' value='${res['search']}' />
         &nbsp;
-        <a href='/ddu/joy/logs/search'>${res['advanced']}</a>
+        <a href='/ddu/joy/logs?search'>${res['advanced']}</a>
       </td>
     </form>
     <td align='right' > </td>
