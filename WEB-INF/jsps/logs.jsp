@@ -12,16 +12,15 @@
           <table border='1' width='300'>
             <tr>
               <c:if test='${prev > 0}'>
-              <td width='40'><a href='/ddu/joy/logs?page=${prev}'>${res['prev']}</a></td>
+              <td width='40'><a href='/ddu/joy/logs?page=${prev}&${all}'>${res['prev']}</a></td>
               </c:if>
               <c:forEach items='${pages}' var='page' varStatus='vs'>
               <td width='30'>
-                <a href='/ddu/joy/logs?page=${page}'>${page}</a>
+                <a href='/ddu/joy/logs?page=${page}&${all}'>${page}</a>
               </td>
               </c:forEach>
               <td>
-                <c:if test='${more > 0}'><a href='/ddu/joy/logs?page=${more}'>${res['more']}</a></c:if>
-      &nbsp;
+                <c:if test='${more > 0}'><a href='/ddu/joy/logs?page=${more}&${all}'>${res['more']}</a></c:if>
               </td></tr>
           </table>
         </td>

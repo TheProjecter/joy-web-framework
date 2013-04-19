@@ -27,7 +27,9 @@
 (defn- select-tags [] (db/select ds ["select * from tags"]))
 
 (defn- pages [page total per-page]
+  (println "page:" page ", total:" total)
   (let [last-page (+ (if (= 0 (mod total per-page)) 0 1) (quot total per-page))]
+    (println "last-page:" last-page)
     (if (and (>= page 1) (<= page last-page))
       (let [page-groups (partition 5 5 nil (range 1 (+ 1 last-page)))
             pages (some #(if (<= page (last %)) % false) page-groups)
@@ -41,16 +43,15 @@
     ))
 
 (defn select-logs* [{:keys [wh args page]}]
-  (println "wh =>" wh ", args =>" args)
-  (let [per-page 3
+  (let [per-page 6
         sql-count (str "select count(*) from logs " wh)
         total (first (vals (first (db/select ds (into [sql-count] args)))))]
     (if-let [page-info (pages page total per-page)]
       (assoc page-info
         :logs (db/select ds (into [(str "select limit "
                                         (:start page-info) " " per-page " "
-                                        "* from logs " wh)] args))))
-    {:logs []}
+                                        "* from logs " wh)] args)))
+      {:logs []})
     ))
 
 ;; GET /ddu/joy/logs?search
@@ -66,9 +67,10 @@
 ;; GET /ddu/joy/logs/2013/4?page=2
 (defn select-logs
   ([] (let [wh (servlet/session-get "wh") args (servlet/session-get "args")
-            page (servlet/param "page")]
-        (if (and wh args page)
-          (select-logs wh args page) (select-logs nil))
+            all (servlet/param "all")]
+        (if all (select-logs nil)
+            (if (and wh args)
+              (select-logs wh args (servlet/param "page" "1"))))
         ))
   ([y] (select-logs y nil))
   ([y m] (select-logs y m nil nil nil (servlet/param "page" "1")))
@@ -91,7 +93,9 @@
      (let [{:keys [logs pages more prev page]}
            (select-logs* {:wh wh :args args :page (Integer/parseInt page)})]
        (rs/tiles
-        "logs" {"logs" logs "pages" pages "more" more "prev" prev "page" page})
+        "logs" {"logs" logs "pages" pages "more" more
+                "prev" prev "page" page
+                "all" (if (servlet/param "all") "all")})
        ))
   )
 
