@@ -7,11 +7,16 @@
 
 (defn set
   ([m] (doseq [[n v] m] (set n v)))
-  ([name val] (.setAttribute *http-session* name val)))
+  ([name val] (.setAttribute *http-session* name val) val)
+  )
 
-(defn get [name] (.getAttribute *http-session* name))
+(defn get
+  ([name] (.getAttribute *http-session* name))
+  ([name val] (or (get name) val))
+  )
 
-(defn remove [name] (.removeAttribute *http-session* name))
+(defn remove [name & x]
+  (doseq [n (cons name x)] (.removeAttribute *http-session* n)))
 
 (defn attr? [name] (not (nil? (get name))))
 

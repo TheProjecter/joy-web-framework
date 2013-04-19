@@ -12,15 +12,15 @@
           <table border='1' width='300'>
             <tr>
               <c:if test='${prev > 0}'>
-              <td width='40'><a href='/ddu/joy/logs?page=${prev}&${all}'>${res['prev']}</a></td>
+              <td width='40'><a href='/ddu/joy/logs?page=${prev}'>${res['prev']}</a></td>
               </c:if>
               <c:forEach items='${pages}' var='page' varStatus='vs'>
               <td width='30'>
-                <a href='/ddu/joy/logs?page=${page}&${all}'>${page}</a>
+                <a href='/ddu/joy/logs?page=${page}'>${page}</a>
               </td>
               </c:forEach>
               <td>
-                <c:if test='${more > 0}'><a href='/ddu/joy/logs?page=${more}&${all}'>${res['more']}</a></c:if>
+                <c:if test='${more > 0}'><a href='/ddu/joy/logs?page=${more}'>${res['more']}</a></c:if>
               </td></tr>
           </table>
         </td>
@@ -39,7 +39,7 @@
     <td>&nbsp;</td>
     <td>${log['id']}</td>
     <td>
-      <a href='/ddu/joy/log/${log['id']}?page=${page}&${all}'>${log['title']}</a>
+      <a href='/ddu/joy/log/${log['id']}'>${log['title']}</a>
     </td>
   </tr>
   </c:forEach>
