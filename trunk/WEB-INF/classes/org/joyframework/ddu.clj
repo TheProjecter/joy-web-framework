@@ -78,8 +78,7 @@
      (let [{:keys [logs pages more prev page]}
            (select-logs* {:wh wh :args args :page (Integer/parseInt page)})]
        (rs/tiles
-        "logs" {"logs" logs "pages" pages "more" more
-                "prev" prev "page" page})
+        "logs" {"logs" logs "pages" pages "more" more "prev" prev "page" page})
        ))
   )
 
@@ -129,12 +128,11 @@
   )
 
 (defn GET-log [id]
-  (try
-    (if (<= (Integer/parseInt id) 0)
-      (rs/tiles "log-edit" {"id" 0 "tags" (select-tags)})
-      (select-log id "log"))
-    (catch Exception ex (.printStackTrace ex))
-    ))
+  (try (if (<= (Integer/parseInt id) 0)
+         (rs/tiles "log-edit" {"id" 0 "tags" (select-tags)})
+         (select-log id "log"))
+       (catch Exception ex (.printStackTrace ex))
+       ))
 
 (defn- log-from-request [id]
   (let [insert? (<= (Integer/parseInt id) 0)
