@@ -39,7 +39,7 @@
     <td>&nbsp;</td>
     <td>${log['id']}</td>
     <td>
-      <a href='/ddu/joy/log/${log['id']}'>${log['title']}</a>
+      <a href='/ddu/joy/log/${log['id']}?page=${page}&${all}'>${log['title']}</a>
     </td>
   </tr>
   </c:forEach>
