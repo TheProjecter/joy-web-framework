@@ -3,7 +3,7 @@
 (ns org.joyframework.validation
   (:require [clojure.string :as str]
             [org.joyframework.request :as req])
-  (:use [org.joyframework servlet resources]))
+  (:use [org.joyframework resources]))
 
 (def ^:dynamic *field-value*)
 
