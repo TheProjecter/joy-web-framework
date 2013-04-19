@@ -4,8 +4,9 @@
     (:require [org.joyframework.route :reload true :as route]
               [org.joyframework.result :reload true :as rs]
               [org.joyframework.resources :reload true :as res]
-              [org.joyframework.servlet :reload true :as servlet]
               [org.joyframework.db :reload true :as db]
+              [org.joyframework.session :reload true :as sess]
+              [org.joyframework.request :reload true :as req]
               [clj-time.core :as dt]
               [clojure.java.jdbc :as sql]))
 
@@ -43,6 +44,7 @@
     ))
 
 (defn select-logs* [{:keys [wh args page]}]
+  (println "wh ==>" wh ", args ==>" args)
   (let [per-page 3
         sql-count (str "select count(*) from logs " wh)
         total (first (vals (first (db/select ds (into [sql-count] args)))))]
@@ -67,7 +69,7 @@
                                    (reduce #(str % " or " %2) (for [_ tags] (str "ts.id=?")))
                                    "))"))))
            args (into (vec (filter #(not (nil? %)) [y m d t])) tags)]
-       (servlet/session-set {"wh" wh "args" args})
+       (sess/set {"wh" wh "args" args})
        (select-logs wh args page)
        ))
   ([wh args page]
@@ -76,7 +78,7 @@
        (rs/tiles
         "logs" {"logs" logs "pages" pages "more" more
                 "prev" prev "page" page
-                "all" (if (servlet/param "all") "all")})
+                "all" (if (req/param "all") "all")})
        ))
   )
 
@@ -95,21 +97,22 @@
 
 (defn GET-logs "url: /joy/logs/2013/4?page=1"
   ([] (cond
-       (servlet/param "all") (GET-logs nil)
-       (servlet/param "search") (rs/tiles "logs-search" {"tags" (select-tags)})
-       :else (let [wh (servlet/session-get "wh") args (servlet/session-get "args")]
+       (req/param "all") (GET-logs nil)
+       (req/param "search") (rs/tiles "logs-search" {"tags" (select-tags)})
+       :else (let [wh (sess/get "wh") args (sess/get "args")]
                (if (and wh args)
-                 (select-logs wh args (servlet/param "page" "1"))
+                 (select-logs wh args (req/param "page" "1"))
                  (rs/tiles "logs")))
        ))
   ([year] (GET-logs year nil))
-  ([year month] (select-logs year month nil nil nil (servlet/param "page" "1")))
+  ([year month] (select-logs year month nil nil nil (req/param "page" "1")))
   )
 
 (defn POST-logs []
-  (let [tag (servlet/param "tag" nil)]
-    (select-logs (servlet/param "year" nil) (servlet/param "month" nil)
-                 (servlet/param "date" nil) (servlet/param "title" nil)
+  (let [[year month date title tag]
+        (req/param #(if (== 0 (count %)) nil %) "year" "month" "date" "title" "tag")]
+    ;;(println "year:" year ", month: " month ", date:" date ", title:" title)
+    (select-logs year month date title
                  (if-not (nil? tag) (if (string? tag) [tag] (vec tag)))
                  "1")))
 
@@ -120,8 +123,8 @@
                                    and log_tags.log_id = ?" id])]
           (assoc log "tags" tags)))
   ([id target] (rs/tiles target {"log" (select-log id) "id" id
-                                 "page" (servlet/param "page")
-                                 "all" (if (servlet/param "all") "all")}))
+                                 "page" (req/param "page")
+                                 "all" (if (req/param "all") "all")}))
   )
 
 (defn GET-log [id]
@@ -135,10 +138,10 @@
 (defn- log-from-request [id]
   (let [insert? (<= (Integer/parseInt id) 0)
         tid (if insert? (next-id) id)
-        tags (servlet/param "tag")
+        tags (req/param "tag")
         checked-tags (if (string? tags) [tags] tags)]
     [insert?
-     {:title (servlet/param "title") :content (servlet/param "content") :id tid}
+     {:title (req/param "title") :content (req/param "content") :id tid}
      (map #(vector tid %) checked-tags)]))
 
 (defn POST-log [id]
@@ -162,7 +165,7 @@
                                            (assoc x "checked" true) x))) %
                                            (log "tags")) (select-tags))]
     (rs/tiles "log-edit" {"log" log "tags" tags "id" id
-                          "all" (if (servlet/param "all") "all")})))
+                          "all" (if (req/param "all") "all")})))
 
 (defn GET-tags [] (rs/tiles "tags" {"tags" (select-tags)}))
 
@@ -174,7 +177,7 @@
 (defn POST-tag [id]
   (let [insert? (<= (Integer/parseInt id) 0)
         tid (if insert? (next-id) id)
-        tag (servlet/param "tag")]
+        tag (req/param "tag")]
     (sql/with-connection {:datasource ds}
       (if insert?
         (sql/insert-record "tags" {:id tid :tag tag})

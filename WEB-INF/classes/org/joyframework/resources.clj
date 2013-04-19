@@ -1,8 +1,9 @@
 ; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.resources
-  (:use [org.joyframework servlet])
-  (:require [clojure.string :as str])
+  ;;(:use [org.joyframework servlet])
+  (:require [org.joyframework.request :as req]
+            [clojure.string :as str])
   (:import [java.util ResourceBundle MissingResourceException]
            [javax.servlet.jsp.jstl.fmt LocalizationContext]
            [java.text MessageFormat])
@@ -72,11 +73,8 @@
     ))
 
 (defn set-resources-into-request
-  ""
   []
   (doseq [[k v] RES]
-    ;;(println "k:" (str k) ", v:" v)
-    (.setAttribute *http-request* (name k) v ;;(:map v)
-                   ))
+    (.setAttribute req/*http-request* (name k) v))
   )
 

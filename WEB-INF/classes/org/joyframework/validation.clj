@@ -1,7 +1,8 @@
 ; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.validation
-  (:require [clojure.string :as str])
+  (:require [clojure.string :as str]
+            [org.joyframework.request :as req])
   (:use [org.joyframework servlet resources]))
 
 (def ^:dynamic *field-value*)
@@ -18,7 +19,7 @@
   (let [{:keys [field label key id short-circuit]
          :or {short-circuit true}} (if (map? field-info)
                                      field-info {:field field-info}) 
-         field-value (*http-params* field)
+         field-value (req/*http-params* field)
          r (reduce
             (fn [rs el] ;; el is an element of valis
               (binding [*field-name* field
