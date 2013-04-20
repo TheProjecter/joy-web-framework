@@ -6,11 +6,10 @@
 
 (def ^:dynamic *http-request*)
 (def ^:dynamic *http-params*)
-(def ^:dynamic *path*)
 
 (defn set
   ([m] (doseq [[n v] m] (set n v)))
-  ([name val] (.setAttribute *http-request* name val)))
+  ([name val] (.setAttribute *http-request* name val) val))
 
 (defn get [name] (.getAttribute *http-request*))
 
@@ -30,19 +29,21 @@
     (into {} (for [[k v] params] [k (if (== 1 (alength v)) (aget v 0) v)]))
     ))
 
-(defn path [request]
-  (let [path-info (or (.getPathInfo request) "/") 
+(defn path []
+  (let [path-info (or (.getPathInfo *http-request*) "/")
         ;;_ (println "path-info:" path-info)
-        servlet-path (.getServletPath request)
+        servlet-path (.getServletPath *http-request*)
         ;;_ (println "servlet-path:" servlet-path)
+        ;;path
+        ;;_ (.setAttribute request "__jf_src_page__" (str path "?" ))
         ]
-    (str/split
-     (util/trim-slashes
-      (if path-info path-info
-          (let [i (.lastIndexOf servlet-path ".")]
-            (if (== -1 i) servlet-path
-                (.substring servlet-path 0 i))))
-      ) #"/")
+    ;;(str/split path #"/")
+    [(util/trim-slashes
+       (if path-info path-info
+         (let [i (.lastIndexOf servlet-path ".")]
+           (if (== -1 i) servlet-path
+             (.substring servlet-path 0 i))))
+       ) (.getQueryString *http-request*)]
     ))
 
 (defn header [name] (.getHeader *http-request* name))

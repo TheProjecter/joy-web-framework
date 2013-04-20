@@ -24,13 +24,14 @@
   [bss request response]
   (binding [*bootstraps* bss
             resp/*http-response* response
-            req/*path* (req/path request)
             req/*http-request* request
             req/*http-params* (req/params request)
             sess/*http-session* (.getSession request)
             ctxt/*servlet-context* (.. request getSession getServletContext)]
-    (let [[handler args ns] (get-handler (get-route))]
+    (let [[p q] (req/path)
+          [handler args ns] (get-handler (get-route p))]
       (flash/reinstate)
+      (req/set "__jf_src_page__" (str p (if q "?") q))
       (try
         (if handler
           (doto handler
@@ -119,8 +120,8 @@
 
 
 (defn- get-route ""
-  []
-  (loop [[r & rs :as path] req/*path* m (var-get ('rt *bootstraps*))]
+  [p]
+  (loop [[r & rs :as path] (str/split p #"/") m (var-get ('rt *bootstraps*))]
     (if-let [sub-rt (m r)]
       (recur rs sub-rt) (assoc m :path path)))
   )
