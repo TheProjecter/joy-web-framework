@@ -13,4 +13,4 @@
   to the form for which validation is performed.
 --%>
 
-<input type='hidden' name='__jf_src_page__' value='${__jf_src_page__}' />
+<input type='text' name='__jf_src_page__' value='${__jf_src_page__}' />

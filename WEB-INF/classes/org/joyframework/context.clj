@@ -3,3 +3,5 @@
 (ns org.joyframework.context)
 
 (def ^:dynamic *servlet-context*)
+
+(defn path [] (.getContextPath *servlet-context*))
