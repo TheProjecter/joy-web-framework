@@ -143,6 +143,18 @@
      {:title (req/param "title") :content (req/param "content") :id tid}
      (map #(vector tid %) checked-tags)]))
 
+(defn- required* [{:keys [field-name field-id field-label field-label-key]}]
+  (if (empty? (req/param field-name)) false true) 
+  )
+
+(defn- required [& specs]
+  (every? true? (map required* specs)) 
+  )
+
+(defn POST-log-validate []
+  (required {:field-name "title"})
+  )
+
 (defn POST-log [id]
   (let [[insert? log tags] (log-from-request id)]
     (sql/with-connection {:datasource ds}
@@ -172,6 +184,11 @@
    "tag" (if (< 0 (Integer/parseInt id))
            {"tag" (first (db/select ds ["select * from tags where id=?" id]))})
    ))
+
+(defn POST-tag-validate []
+  (println "POST-tag-validate")
+  (required {:field-name "tag"})
+  )
 
 (defn POST-tag [id]
   (let [insert? (<= (Integer/parseInt id) 0)

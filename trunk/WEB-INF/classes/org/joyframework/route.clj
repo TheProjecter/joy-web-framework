@@ -28,16 +28,16 @@
             req/*http-params* (req/params request)
             sess/*http-session* (.getSession request)
             ctxt/*servlet-context* (.. request getSession getServletContext)]
-    (let [[p q] (req/path)
+    (let [[s p q] (req/path)
           [handler args ns] (get-handler (get-route p))]
       (flash/reinstate)
-      (req/set "__jf_src_page__" (str p (if q "?") q))
       (try
         (if handler
-          (doto handler
-            valid-http-method? valid-token? checkbox
-            (validate ns)
-            (apply args))
+          (if (validate handler ns)
+            (do
+              (req/set "__jf_src_page__" (str p (if q "?") q))
+              (apply handler args))
+            (r/redirect (str (ctxt/path) s "/" (req/param "__jf_src_page__"))))
           (r/not-found))
         (catch Exception ex
           (if-let [h ('exception-handler *bootstraps*)] (h ex) (throw ex))
@@ -79,7 +79,7 @@
   (let [m (meta handler)
         vali (or (:vali m) ((ns-publics ns)
                             (symbol (str (:name m) "-validate"))))]
-    (if vali (vali))))
+    (if vali (vali) true)))
 
 (defn- invoke
   "Invokes the validations configured on the handler. If validation

@@ -11,7 +11,7 @@
   ([m] (doseq [[n v] m] (set n v)))
   ([name val] (.setAttribute *http-request* name val) val))
 
-(defn get [name] (.getAttribute *http-request*))
+(defn get [name] (.getAttribute *http-request* name))
 
 (defn remove [name] (.removeAttribute *http-request* name))
 
@@ -32,11 +32,13 @@
 (defn path []
   (let [path-info (or (.getPathInfo *http-request*) "/")
         servlet-path (.getServletPath *http-request*)]
-    [(util/trim-slashes
-       (if path-info path-info
-         (let [i (.lastIndexOf servlet-path ".")]
-           (if (== -1 i) servlet-path
-             (.substring servlet-path 0 i)))))
+    (println "path-info:" path-info ", servlet-path:" servlet-path)
+    [servlet-path
+     (util/trim-slashes
+      (if path-info path-info
+          (let [i (.lastIndexOf servlet-path ".")]
+            (if (== -1 i) servlet-path
+                (.substring servlet-path 0 i)))))
      (.getQueryString *http-request*)]
     ))
 

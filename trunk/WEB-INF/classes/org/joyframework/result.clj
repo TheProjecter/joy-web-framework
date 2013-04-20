@@ -52,9 +52,8 @@
   ([path] (forward path {}))
   ([path http-attrs]
      (req/set http-attrs)
-     (.. req/*http-request*
-         (getRequestDispatcher path)
-         (forward req/*http-request* resp/*http-response*))) 
+     (.forward (.getRequestDispatcher req/*http-request* path)
+               req/*http-request* resp/*http-response*)) 
   )
 
 (defn tiles
