@@ -31,19 +31,13 @@
 
 (defn path []
   (let [path-info (or (.getPathInfo *http-request*) "/")
-        ;;_ (println "path-info:" path-info)
-        servlet-path (.getServletPath *http-request*)
-        ;;_ (println "servlet-path:" servlet-path)
-        ;;path
-        ;;_ (.setAttribute request "__jf_src_page__" (str path "?" ))
-        ]
-    ;;(str/split path #"/")
+        servlet-path (.getServletPath *http-request*)]
     [(util/trim-slashes
        (if path-info path-info
          (let [i (.lastIndexOf servlet-path ".")]
            (if (== -1 i) servlet-path
-             (.substring servlet-path 0 i))))
-       ) (.getQueryString *http-request*)]
+             (.substring servlet-path 0 i)))))
+     (.getQueryString *http-request*)]
     ))
 
 (defn header [name] (.getHeader *http-request* name))
