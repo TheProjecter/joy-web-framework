@@ -1,13 +1,15 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib prefix='fmt' uri='http://java.sun.com/jsp/jstl/fmt' %>
+<%@ taglib prefix='jf' tagdir='/WEB-INF/tags' %>
 
 <style>
   textarea {resize:none;}
 </style>
 
 <form method='post' action='/ddu/joy/log/${id}'>
-  <input name='__jf_src_page__' value='${__jf_src_page__}' />
+
+  <jf:srcPage />
+
   <table border='1' width='100%'>
     <tr>
       <td width='80'>${res['title']}</td>
