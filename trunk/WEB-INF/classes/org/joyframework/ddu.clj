@@ -163,8 +163,7 @@
                                          (if (= (x "id") (y "id"))
                                            (assoc x "checked" true) x))) %
                                            (log "tags")) (select-tags))]
-    (rs/tiles "log-edit" {"log" log "tags" tags "id" id
-                          "__jf_src_page__" req/*path*})))
+    (rs/tiles "log-edit" {"log" log "tags" tags "id" id})))
 
 (defn GET-tags [] (rs/tiles "tags" {"tags" (select-tags)}))
 
