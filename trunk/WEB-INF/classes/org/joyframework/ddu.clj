@@ -7,7 +7,7 @@
               [org.joyframework.db :reload true :as db]
               [org.joyframework.session :reload true :as sess]
               [org.joyframework.request :reload true :as req]
-              [org.joyframework.validation2 :reload true :as vali]
+              [org.joyframework.validation :reload true :as vali]
               [clj-time.core :as dt]
               [clojure.java.jdbc :as sql]))
 
@@ -186,7 +186,7 @@
 
 (defn POST-tag-validate []
   (println "POST-tag-validate")
-  (required {:field-name "tag"})
+  (vali/required {:field-name "tag"})
   )
 
 (defn POST-tag [id]
