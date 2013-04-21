@@ -78,46 +78,6 @@
     (set! req/*http-params* (into req/*http-params* chks) ))
   )
 
-
-
-(defn- invoke
-  "Invokes the validations configured on the handler. If validation
-   succeeds, the handler is invoked to process the user's request."
-  [handler args]
-  (let [{:keys [input redirect forward tiles
-                short-circuit form] :or {short-circuit true} :as vali}
-        (:vali (meta handler))
-        ;;_ (println "form:" form)
-        rules (filter #(let [[k v] %]
-                         (not (or (= :input k) (= :redirect k)
-                                  (= :tiles k) (= :forward k)
-                                  (= :form k)
-                                  (= :short-circuit k)))) vali)
-        ;;_ (println "rules:" rules)
-        e (loop [[[f [s & rule]] & xs] rules rs {}]
-            ;;(println "f===>" f)
-            (cond
-             (and short-circuit (not (empty? rs))) rs
-             (nil? f) (if-let [fs (and form (form))]
-                        (merge-with concat rs {"form" fs}) rs)
-             :else (recur
-                    xs (merge-with concat rs
-                                   (validate* (assoc s :field (name f))
-                                              rule)))))
-        ;;(println "e:" e)
-        ]
-    (if (empty? e)
-      (apply handler args)
-      (if input (input {"errors" e})
-          (let [p (conj req/*http-params* {"errors" e})]
-            (cond redirect (r/redirect redirect p)
-                  tiles (r/tiles tiles p)
-                  forward (r/forward forward p))
-            ))
-      )))
-
-
-
 (defn- get-route ""
   [p]
   (loop [[r & rs :as path] (str/split p #"/") m (var-get ('rt *bootstraps*))]
