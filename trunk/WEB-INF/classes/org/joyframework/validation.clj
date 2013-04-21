@@ -1,6 +1,6 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
-(ns org.joyframework.validation2
+(ns org.joyframework.validation
   (:require [org.joyframework.result :as rs]
             [org.joyframework.request :as req]
             [org.joyframework.resources :as res]))
