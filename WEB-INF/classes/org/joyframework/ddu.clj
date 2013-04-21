@@ -7,6 +7,7 @@
               [org.joyframework.db :reload true :as db]
               [org.joyframework.session :reload true :as sess]
               [org.joyframework.request :reload true :as req]
+              [org.joyframework.validation2 :reload true :as vali]
               [clj-time.core :as dt]
               [clojure.java.jdbc :as sql]))
 
@@ -143,16 +144,13 @@
      {:title (req/param "title") :content (req/param "content") :id tid}
      (map #(vector tid %) checked-tags)]))
 
-(defn- required* [{:keys [field-name field-id field-label field-label-key]}]
-  (if (empty? (req/param field-name)) false true) 
-  )
-
-(defn- required [& specs]
-  (every? true? (map required* specs)) 
-  )
 
 (defn POST-log-validate []
-  (required {:field-name "title"})
+  (vali/with-validation
+    (vali/tiles "log-edit")
+    (rule {:field-name "title"} required (minlength 2) (maxlength 10))    
+    (rule {:field-name "content"} required (maxlength 2000))
+    )
   )
 
 (defn POST-log [id]
@@ -175,7 +173,8 @@
                                          (if (= (x "id") (y "id"))
                                            (assoc x "checked" true) x))) %
                                            (log "tags")) (select-tags))]
-    (rs/tiles "log-edit" {"log" log "tags" tags "id" id})))
+    (rs/tiles "log-edit" { "id" id "title" (log "title")
+                           "content" (log "content") "tags" tags})))
 
 (defn GET-tags [] (rs/tiles "tags" {"tags" (select-tags)}))
 
