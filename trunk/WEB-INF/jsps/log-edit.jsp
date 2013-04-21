@@ -13,12 +13,12 @@
   <table border='1' width='100%'>
     <tr>
       <td width='80'>${res['title']}</td>
-      <td ><input name='title' value='${log['title']}' /></td>
+      <td ><input name='title' value='${title}' /></td>
     </tr>
     <tr>
       <td>${res['content']}</td>
       <td >
-        <textarea cols='62' rows='20' name='content'>${log["content"]}</textarea>
+        <textarea cols='62' rows='20' name='content'>${content}</textarea>
       </td>
     </tr>
     <tr>

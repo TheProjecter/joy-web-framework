@@ -32,7 +32,7 @@
 (defn path []
   (let [path-info (or (.getPathInfo *http-request*) "/")
         servlet-path (.getServletPath *http-request*)]
-    (println "path-info:" path-info ", servlet-path:" servlet-path)
+    ;;(println "path-info:" path-info ", servlet-path:" servlet-path)
     [servlet-path
      (util/trim-slashes
       (if path-info path-info

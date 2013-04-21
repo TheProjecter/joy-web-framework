@@ -33,16 +33,19 @@
       (flash/reinstate)
       (try
         (if handler
-          (if (validate handler ns)
-            (do
-              (req/set "__jf_src_page__" (str p (if q "?") q))
-              (apply handler args))
-            (r/redirect (str (ctxt/path) s "/" (req/param "__jf_src_page__"))))
+          (if-let [f (validate (meta handler) ns)] (f)
+            (do (req/set "__jf_src_page__" (str p (if q "?") q))
+                (apply handler args)))
           (r/not-found))
         (catch Exception ex
           (if-let [h ('exception-handler *bootstraps*)] (h ex) (throw ex))
           ))
       )))
+
+(defn- validate [m ns]
+  (if-let [v (or (:vali m) ((ns-publics ns)
+                            (symbol (str (:name m) "-validate"))))]
+    (v)))
 
 (defn- valid-http-method? ""
   [handler]
@@ -75,11 +78,7 @@
     (set! req/*http-params* (into req/*http-params* chks) ))
   )
 
-(defn- validate [handler ns]
-  (let [m (meta handler)
-        vali (or (:vali m) ((ns-publics ns)
-                            (symbol (str (:name m) "-validate"))))]
-    (if vali (vali) true)))
+
 
 (defn- invoke
   "Invokes the validations configured on the handler. If validation
