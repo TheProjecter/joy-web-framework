@@ -50,6 +50,7 @@
 
 (defn forward
   ([path] (forward path {}))
+  ([path http-attrs & x] (forward path (apply merge http-attrs x)))
   ([path http-attrs]
      (req/set http-attrs)
      (.forward (.getRequestDispatcher req/*http-request* path)
@@ -58,6 +59,7 @@
 
 (defn tiles
   ([id] (tiles id {}))
+  ([id http-attrs & x] (tiles id (apply merge http-attrs x)))
   ([id http-attrs]
      (let [args (object-array 2)]
        (aset args 0 req/*http-request*)

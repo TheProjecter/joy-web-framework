@@ -33,19 +33,31 @@
       (flash/reinstate)
       (try
         (if handler
-          (if-let [f (validate (meta handler) ns)] (f)
-            (do (req/set "__jf_src_page__" (str p (if q "?") q))
-                (apply handler args)))
+          (when (validate (meta handler) ns args)
+            (req/set "__jf_src_page__" (str p (if q "?") q))
+            (apply handler args))
           (r/not-found))
         (catch Exception ex
           (if-let [h ('exception-handler *bootstraps*)] (h ex) (throw ex))
           ))
       )))
 
-(defn- validate [m ns]
-  (if-let [v (or (:vali m) ((ns-publics ns)
-                            (symbol (str (:name m) "-validate"))))]
-    (v)))
+(defn- validate [m ns args]
+  (let [v (or (:vali m) ((ns-publics ns) (symbol (str (:name m) "-validate"))))
+        errors (if v (apply v args))]
+    (println "errors ==>" errors)
+    (if (empty? errors) true
+        (let [{:keys [forward tiles redirect input]} (meta v)]
+          (cond
+           forward (r/forward forward req/*http-params* errors)
+           tiles (r/tiles tiles req/*http-params* errors)
+           redirect (r/redirect redirect errors)
+           input (input errors)
+           :else (r/redirect (req/get "__jf_src_page__") errors)
+           )
+          )
+        ))
+  )
 
 (defn- valid-http-method? ""
   [handler]

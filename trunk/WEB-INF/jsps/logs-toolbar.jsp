@@ -8,7 +8,7 @@
     <form method='post' action='/ddu/joy/logs?page=1' >
       <td width='60'><input name='year' size='5' value='${year}' /></td>
       <td width='40'><input name='month' size='3' value='${month}' /></td>
-      <td width='140'>
+      <td width='160'>
         <input type='submit' value='${res['search']}' />
         &nbsp;
         <a href='/ddu/joy/logs?search'>${res['advanced']}</a>

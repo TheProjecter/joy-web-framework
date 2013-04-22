@@ -11,3 +11,5 @@
             (let [l (.length s)]
               (.substring s (if b1 1 0) (if b2 (- l 1) l))) s)))
     ))
+
+(defn array? [obj] (and obj (.isArray (class obj))))
