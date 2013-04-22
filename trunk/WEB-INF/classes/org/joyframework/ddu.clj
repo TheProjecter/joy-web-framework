@@ -97,23 +97,22 @@
 ;; GET /ddu/joy/logs/2013/4?page=2
 
 (defn GET-logs "url: /joy/logs/2013/4?page=1"
+  ([]
 
-;;  (vali/with-rules
-;;    (vali/tiles "log-edit")
-;;    (vali/rule {:field-name "title"} required #(minlength 2) #(maxlength 10))    
-;;    (vali/rule {:field-name "content"} required #(maxlength 2000))
-;;    )
-  (vali/with-rules (fn []) (fn []) (fn []))
-
-  ([] (cond
-       (req/param "search") (rs/tiles "logs-search" {"tags" (select-tags)})
-       (or (req/param "all") (sess/attr? "all")) (do (sess/set "all" true)
-                                                     (select-logs (page)))
-       :else (let [wh (sess/get "wh") args (sess/get "args")]
-               (if (or wh args)
-                 (select-logs wh args (page))
-                 (rs/tiles "logs")))
-       ))
+  (vali/with-rules
+    (vali/tiles "log-edit")
+    (vali/rule {:field-name "title"} vali/required #(vali/minlength 2) #(vali/maxlength 10))    
+    (vali/rule {:field-name "content"} vali/required #(vali/maxlength 2000))
+    )
+     (cond
+      (req/param "search") (rs/tiles "logs-search" {"tags" (select-tags)})
+      (or (req/param "all") (sess/attr? "all")) (do (sess/set "all" true)
+                                                    (select-logs (page)))
+      :else (let [wh (sess/get "wh") args (sess/get "args")]
+              (if (or wh args)
+                (select-logs wh args (page))
+                (rs/tiles "logs")))
+      ))
   ([year] (GET-logs year nil))
   ([year month]
      (sess/remove "all" "page")
