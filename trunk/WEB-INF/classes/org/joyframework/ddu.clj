@@ -97,6 +97,14 @@
 ;; GET /ddu/joy/logs/2013/4?page=2
 
 (defn GET-logs "url: /joy/logs/2013/4?page=1"
+
+;;  (vali/with-rules
+;;    (vali/tiles "log-edit")
+;;    (vali/rule {:field-name "title"} required #(minlength 2) #(maxlength 10))    
+;;    (vali/rule {:field-name "content"} required #(maxlength 2000))
+;;    )
+  (vali/with-rules (fn []) (fn []) (fn []))
+
   ([] (cond
        (req/param "search") (rs/tiles "logs-search" {"tags" (select-tags)})
        (or (req/param "all") (sess/attr? "all")) (do (sess/set "all" true)
@@ -146,11 +154,7 @@
 
 
 (defn POST-log-validate []
-  (vali/with-validation
-    (vali/tiles "log-edit")
-    (rule {:field-name "title"} required (minlength 2) (maxlength 10))    
-    (rule {:field-name "content"} required (maxlength 2000))
-    )
+
   )
 
 (defn POST-log [id]

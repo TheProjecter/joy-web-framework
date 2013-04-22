@@ -22,15 +22,30 @@
       )) 
   )
 
-(defn required [])
+(defn required [] "required")
 
-(defn minlength [l])
+(defn minlength [len] "minlength")
 
-(defn maxlength [l])
+(defn maxlength [len] "maxlength")
 
-(defmacro rule [spec & vs])
+(defn rule [spec & vs]
+  (binding [*field-spec* spec]
+    (reduce (fn [m f]
+              (if (empty? m)
+                (if-let [msg (f)]
+                  (assoc m (or (:field-id spec) __jf_page_err__) msg))
+                m)) {} vs)
+    ))
 
-(defmacro with-validation [f & rules])
+(defn put [m k val]
+  (assoc m k (if-let [v (m k)]
+               (conj (if (vector? v) v [v]) val) val)))
+
+(defmacro with-rules [f & rules]
+;;  `(reduce (fn [m# rule#] (let [[k# msg#] (rule#)] (put m# k# msg#))) {} [~@rules])
+  )
+
+
 
 
 
