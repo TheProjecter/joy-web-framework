@@ -8,6 +8,7 @@
               [org.joyframework.session :reload true :as sess]
               [org.joyframework.request :reload true :as req]
               [org.joyframework.validation :reload true :as vali]
+              [org.joyframework.util :reload true :as u]
               [clj-time.core :as dt]
               [clojure.java.jdbc :as sql]))
 
@@ -29,7 +30,16 @@
 
 (defn- today [] (let [d (dt/today)] [(dt/year d) (dt/month d) (dt/day d)]))
 
-(defn- select-tags [] (db/select ds ["select * from tags"]))
+(defn- select-tags
+  ([] (db/select ds ["select * from tags"]))
+  ([checked]
+     (map (fn [tag] (assoc tag "checked"
+                           (some #(== (tag "id")
+                                      (if (string? %) (Integer/parseInt %) %))
+                                 (if (or (coll? checked)
+                                         (u/array? checked)) checked [checked]))))
+          (select-tags)))
+  )
 
 (defn- pages [page total per-page]
   (let [last-page (+ (if (= 0 (mod total per-page)) 0 1) (quot total per-page))]
@@ -98,16 +108,10 @@
 
 (defn GET-logs "url: /joy/logs/2013/4?page=1"
   ([]
-
-  (vali/with-rules
-    (vali/tiles "log-edit")
-    (vali/rule {:field-name "title"} vali/required #(vali/minlength 2) #(vali/maxlength 10))    
-    (vali/rule {:field-name "content"} vali/required #(vali/maxlength 2000))
-    )
      (cond
       (req/param "search") (rs/tiles "logs-search" {"tags" (select-tags)})
-      (or (req/param "all") (sess/attr? "all")) (do (sess/set "all" true)
-                                                    (select-logs (page)))
+      (or (req/param "all")
+          (sess/attr? "all")) (do (sess/set "all" true) (select-logs (page)))
       :else (let [wh (sess/get "wh") args (sess/get "args")]
               (if (or wh args)
                 (select-logs wh args (page))
@@ -152,8 +156,16 @@
      (map #(vector tid %) checked-tags)]))
 
 
-(defn POST-log-validate []
-
+(defn ^{;; :forward "" :redirect "" :input (fn []) :tiles ""
+        :input #(rs/tiles "log-edit" req/*http-params* %
+                          {"tags" (select-tags (req/param "tag"))})}
+  POST-log-validate [id]
+  (let [err (vali/with-rules
+              (vali/rule {:field-name "title"}
+                         vali/required #(vali/length {:min 2 :max 20}))    
+              (vali/rule {:field-name "content"}
+                         vali/required #(vali/length {:max 2000})))]
+    (if (seq err) (assoc err "id" id)))
   )
 
 (defn POST-log [id]
@@ -172,12 +184,13 @@
 
 (defn edit [_ id]
   (let [log (select-log id)
+        _ (println (log "tags"))
         tags (map #(reduce (fn [x y] (if (x "checked") x
                                          (if (= (x "id") (y "id"))
                                            (assoc x "checked" true) x))) %
                                            (log "tags")) (select-tags))]
-    (rs/tiles "log-edit" { "id" id "title" (log "title")
-                           "content" (log "content") "tags" tags})))
+    (rs/tiles "log-edit" { "id" id "title" (log "title") "content" (log "content")
+                           "tags" (select-tags (map #(% "id") (log "tags")))})))
 
 (defn GET-tags [] (rs/tiles "tags" {"tags" (select-tags)}))
 
