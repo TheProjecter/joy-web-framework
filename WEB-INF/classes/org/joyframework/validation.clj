@@ -4,7 +4,9 @@
   (:require [org.joyframework.result :as rs]
             [org.joyframework.request :as req]
             [org.joyframework.resources :as res]
-            [clojure.string :as str]))
+            [org.joyframework.util :as u]
+            [clojure.string :as str])
+  )
 
 (def __jf_page_err__ "__jf_page_err__")
 
@@ -29,6 +31,7 @@
   )
 
 (defn- within [val min max k kmin kmax]
+  ;;(println "val ==>" val)
   (cond
    (and min max) (if (or (< val min) (>= val max))
                    (res/get-message k *field-label* min max))
@@ -48,19 +51,32 @@
 
 (defn maxlength [len] (length {:max len}))
 
+(defn- check-number [f ky min max]
+  (if-not (empty? *trimmed-value*)
+    (let [n (f *trimmed-value* (res/get-message ky *field-label*))]
+      (if (not (number? n)) n
+          (let [{:keys [k kmin kmax] :or {k "vali.between" kmin "vali.min"
+                                          kmax "vali.kmax"}} *field-spec*]
+            (within n min max k kmin kmax))
+          ))
+    ))
+
 (defn integer
   ([] (integer nil))
   ([{:keys [min max]}]
-     (if-not (empty? *trimmed-value*)
-       (let [{:keys [k kmin kmax]
-              :or {k "vali.int" kmin "vali.min" kmax "vali.kmax"}} *field-spec*]
-         (try (within (Integer/parseInt *trimmed-value*) min max k kmin kmax) 
-              (catch NumberFormatException ex (res/get-message k *field-label*)))
-         )))
+     (check-number u/to-int "vali.int" min max))
   )
 
 (defn double [{:keys [min max]}]
+  ([] (double nil))
+  ([{:keys [min max]}]
+     (check-number u/to-double "vali.decimal" min max))
+  )
 
+(defn decimal [{:keys [min max]}]
+  ([] (decimal nil))
+  ([{:keys [min max]}]
+     (check-number u/to-decimal "vali.decimal" min max))
   )
 
 (defn date [{:keys [format before after]}])

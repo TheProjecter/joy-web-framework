@@ -130,7 +130,7 @@
 (defn POST-logs-validate []
   (vali/with-rules nil
     (vali/rule {:field-name "year"} vali/integer)
-    (vali/rule {:field-name "month"} vali/integer))
+    (vali/rule {:field-name "month"} #(vali/integer {:min 0 :max 13})))
   )
 
 (defn POST-logs []

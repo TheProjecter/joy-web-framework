@@ -1,6 +1,7 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
-(ns org.joyframework.util)
+(ns org.joyframework.util
+  (:import java.math.BigDecimal))
 
 (defn trim-slashes "Trims slashes from both ends of the given string argument."
   [s]
@@ -13,3 +14,24 @@
     ))
 
 (defn array? [obj] (and obj (.isArray (class obj))))
+
+(defn- to-number [f y]
+  (try (f)
+       (catch NumberFormatException ex
+         (cond (nil? y) (throw ex) (fn? y) (y) :else y))
+       ))
+
+(defn to-int
+  ([x] (to-int x nil))
+  ([x y] (to-number #(Integer/parseInt x) y))
+  )
+
+(defn to-double
+  ([x] (to-double x nil))
+  ([x y] (to-number #(Double/parseDouble x) y))
+  )
+
+(defn to-decimal
+  ([x] (to-decimal x nil))
+  ([x y] (to-number #(BigDecimal. x) y))
+  )
