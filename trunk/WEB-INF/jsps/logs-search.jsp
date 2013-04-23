@@ -1,7 +1,10 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix='jf' tagdir='/WEB-INF/tags' %>
 
 <form method='post' action='/ddu/joy/logs'>
+  <jf:srcPage />
+  <jf:errors />
   <table border='1' width='500'>
     <tr>
       <td width='80'>${res['year']}</td>

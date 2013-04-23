@@ -41,7 +41,7 @@ CREATE MEMORY TABLE PUBLIC.LOGS(ID BIGINT NOT NULL PRIMARY KEY,TITLE VARCHAR(128
 CREATE MEMORY TABLE PUBLIC.TAGS(ID BIGINT NOT NULL PRIMARY KEY,TAG VARCHAR(128))
 CREATE MEMORY TABLE PUBLIC.LOG_TAGS(LOG_ID BIGINT NOT NULL,TAG_ID BIGINT NOT NULL)
 ALTER SEQUENCE SYSTEM_LOBS.LOB_ID RESTART WITH 1
-ALTER SEQUENCE PUBLIC.SEQ RESTART WITH 76
+ALTER SEQUENCE PUBLIC.SEQ RESTART WITH 77
 SET DATABASE DEFAULT INITIAL SCHEMA PUBLIC
 GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.YES_OR_NO TO PUBLIC
 GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.TIME_STAMP TO PUBLIC
@@ -83,6 +83,7 @@ INSERT INTO LOGS VALUES(70,'waterfowl','a duck',2013,4,23)
 INSERT INTO LOGS VALUES(73,'hung up','adjective <br/>\u000d\u000a<br/>\u000d\u000athinking or worrying too much about something or someone\u000d\u000a<ul>\u000d\u000a<li>\u000d\u000aHe''s still <span style=''font-weight:bold; font-style:italic''>hung up on</span> his ex-wife. \u000d\u000a</li>\u000d\u000a</ul>\u000d\u000a\u000d\u000a<a href=''http://www.learnersdictionary.com/search/hung+up''>More</a>',2013,4,23)
 INSERT INTO LOGS VALUES(74,'normalcy','chiefly US : a normal condition or situation \u000d\u000a<ul>\u000d\u000a<li>\u000d\u000aLet''s hope for an end to the war and a return to <span style=''font-weight:bold''>normalcy</span>.\u000d\u000a</li>\u000d\u000a</ul>',2013,4,23)
 INSERT INTO LOGS VALUES(75,'be into (someone) for something','to owe someone (an amount of money) \u000d\u000a<ul>\u000d\u000a<li>\u000d\u000aI''m <span style=''font-weight:bold''>into him for</span> a thousand dollars.\u000d\u000a</li>\u000d\u000a</ul>',2013,4,23)
+INSERT INTO LOGS VALUES(76,'leggy','1) having long legs -- used especially of a woman <br/>\u000d\u000a2) of a plant : having very long stalks or stems <br/>\u000d\u000a\u000d\u000a<ul>\u000d\u000a<li>\u000d\u000aThe bush has gotten leggy and needs to be pruned.\u000d\u000a</li>\u000d\u000a</ul>',2013,4,23)
 INSERT INTO TAGS VALUES(37,'tag2')
 INSERT INTO TAGS VALUES(38,'ggs')
 INSERT INTO TAGS VALUES(53,'english')
@@ -114,3 +115,4 @@ INSERT INTO LOG_TAGS VALUES(70,53)
 INSERT INTO LOG_TAGS VALUES(73,53)
 INSERT INTO LOG_TAGS VALUES(74,53)
 INSERT INTO LOG_TAGS VALUES(75,53)
+INSERT INTO LOG_TAGS VALUES(76,53)
