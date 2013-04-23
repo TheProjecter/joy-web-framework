@@ -6,6 +6,7 @@
 
 <%@ attribute name='key' required='true' rtexprvalue='true' %>
 
+<c:if test='${not empty requestScope[key]}'>
 <table width='100%' border='0'><tr><td>
 <ul>
 <c:forEach items='${requestScope[key]}' var='msg'>
@@ -13,3 +14,4 @@
 </c:forEach>
 </ul>
 </td></tr></table>
+</c:if>

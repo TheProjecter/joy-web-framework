@@ -6,15 +6,13 @@
   textarea {resize:none;}
 </style>
 
-<jf:errors />
-
 <form method='post' action='/ddu/joy/log/${id}'>
   <jf:srcPage />
   <table border='1' width='100%'>
     <tr>
       <td width='80'>${res['title']}</td>
       <td >
-        <input id='IDTitle' name='title' value='${title}' />
+        <input id='IDTitle' name='title' value='${title}' size='60' />
       </td>
     </tr>
     <tr>

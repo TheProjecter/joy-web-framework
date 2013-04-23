@@ -9,6 +9,7 @@
 (defn error [sc msg] (.sendError *http-response* sc msg))
 
 (defn redirect [url]
+  (println "url ==>" url)
   (.sendRedirect *http-response* (.encodeURL *http-response* url)))
 
 (defn header

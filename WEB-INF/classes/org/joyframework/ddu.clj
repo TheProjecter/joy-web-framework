@@ -127,6 +127,12 @@
      (select-logs year month nil nil nil (page)))
   )
 
+(defn POST-logs-validate []
+  (vali/with-rules nil
+    (vali/rule {:field-name "year"} vali/integer)
+    (vali/rule {:field-name "month"} vali/integer))
+  )
+
 (defn POST-logs []
   (let [[year month date title tag]
         (req/param #(if (== 0 (count %)) nil %) "year" "month" "date" "title" "tag")]
@@ -165,10 +171,9 @@
                           {"tags" (select-tags (req/param "tag"))})}
   POST-log-validate [id]
   (vali/with-rules {"id" id}
-    (vali/rule {:field-name "title"}
-               vali/required #(vali/length {:min 2 :max 20}))    
-    (vali/rule {:field-name "content"}
-               vali/required #(vali/length {:max 2000})))
+    (vali/rule {:field-name "title"} vali/required #(vali/maxlength 50))
+    (vali/rule {:field-name "content"} vali/required #(vali/maxlength 2000))
+    (vali/rule {:field-name "tag"} vali/required))
   )
 
 (defn POST-log [id]
@@ -186,12 +191,7 @@
     ))
 
 (defn edit [_ id]
-  (let [log (select-log id)
-        _ (println (log "tags"))
-        tags (map #(reduce (fn [x y] (if (x "checked") x
-                                         (if (= (x "id") (y "id"))
-                                           (assoc x "checked" true) x))) %
-                                           (log "tags")) (select-tags))]
+  (let [log (select-log id)]
     (rs/tiles "log-edit" { "id" id "title" (log "title") "content" (log "content")
                            "tags" (select-tags (map #(% "id") (log "tags")))})))
 
