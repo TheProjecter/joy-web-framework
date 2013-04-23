@@ -43,7 +43,8 @@
 (defn redirect
   ([url] (redirect url nil))
   ([url args]
-     (doseq [[n v] args] (flash/set n v))
+     ;;(println "args ==>" args)
+     (flash/set args)
      (resp/redirect url))
   )
 

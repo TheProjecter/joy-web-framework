@@ -3,13 +3,13 @@
 (ns org.joyframework.route
   (:use [org.joyframework resources] )
   (:require [clojure.string :as str]
-            [org.joyframework.result :as r]
+            [org.joyframework.result :as r :reload true]
             [org.joyframework.session :as sess]
             [org.joyframework.request :as req]
-            [org.joyframework.response :as resp]
+            [org.joyframework.response :as resp :reload true]
             [org.joyframework.context :as ctxt]
-            [org.joyframework.flash :as flash]
-            [org.joyframework.util :as util])
+            [org.joyframework.flash :as flash :reload true]
+            [org.joyframework.util :as util :reload true])
   (:import java.io.FileNotFoundException))
 
 (def ^:dynamic *bootstraps* "Mappings in the bootstrap namespace.")
@@ -45,7 +45,7 @@
 (defn- validate [m ns args]
   (let [v (or (:vali m) ((ns-publics ns) (symbol (str (:name m) "-validate"))))
         errors (if v (apply v args))]
-    (println "errors ==>" errors)
+    ;;(println "errors ==>" errors)
     (if (empty? errors) true
         (let [{:keys [forward tiles redirect input]} (meta v)]
           (cond
@@ -53,7 +53,7 @@
            tiles (r/tiles tiles req/*http-params* errors)
            redirect (r/redirect redirect errors)
            input (input errors)
-           :else (r/redirect (req/get "__jf_src_page__") errors)
+           :else (r/redirect (req/param "__jf_src_page__") errors)
            )
           )
         ))
