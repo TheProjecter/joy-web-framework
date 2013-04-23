@@ -46,6 +46,8 @@
   (assoc m k (if-let [v (m k)]
                (conj (if (vector? v) v [v]) val) val)))
 
-(defn with-rules [& rules]
-  (reduce (fn [m rule] (if-let [[k msg] (rule)] (put m k msg) m)) {} rules)
-  )
+(defn with-rules [params & rules]
+  (let [errs (reduce (fn [m rule] (if-let [[k msg] (rule)] (put m k msg) m)) {} rules)]
+    (if (seq errs)
+      (into errs params))
+    ))

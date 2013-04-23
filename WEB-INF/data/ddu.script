@@ -41,7 +41,7 @@ CREATE MEMORY TABLE PUBLIC.LOGS(ID BIGINT NOT NULL PRIMARY KEY,TITLE VARCHAR(128
 CREATE MEMORY TABLE PUBLIC.TAGS(ID BIGINT NOT NULL PRIMARY KEY,TAG VARCHAR(128))
 CREATE MEMORY TABLE PUBLIC.LOG_TAGS(LOG_ID BIGINT NOT NULL,TAG_ID BIGINT NOT NULL)
 ALTER SEQUENCE SYSTEM_LOBS.LOB_ID RESTART WITH 1
-ALTER SEQUENCE PUBLIC.SEQ RESTART WITH 66
+ALTER SEQUENCE PUBLIC.SEQ RESTART WITH 68
 SET DATABASE DEFAULT INITIAL SCHEMA PUBLIC
 GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.YES_OR_NO TO PUBLIC
 GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.TIME_STAMP TO PUBLIC
@@ -53,7 +53,7 @@ SET SCHEMA SYSTEM_LOBS
 INSERT INTO BLOCKS VALUES(0,2147483647,0)
 SET SCHEMA PUBLIC
 INSERT INTO LOGS VALUES(3,'','content3abcddd',2013,3,8)
-INSERT INTO LOGS VALUES(4,'babababa','content4',2013,3,7)
+INSERT INTO LOGS VALUES(4,'log4','content4',2013,3,7)
 INSERT INTO LOGS VALUES(23,'t','c',2013,3,10)
 INSERT INTO LOGS VALUES(24,'t2','c2',2013,3,10)
 INSERT INTO LOGS VALUES(25,'abcyesdd','<a href=''''>just dodab it</a>fgh',2013,3,10)
@@ -76,19 +76,22 @@ INSERT INTO LOGS VALUES(60,'tall order','something that is very difficult to do 
 INSERT INTO LOGS VALUES(61,'','',2013,4,19)
 INSERT INTO LOGS VALUES(62,'floor','<strong>:</strong> to surprise, shock or amaze (someone) very much, often used as <span style=''font-weight:bold''>be floored</span>\u000d\u000a\u000d\u000a<ul>\u000d\u000a<li>\u000d\u000a<span style=''font-style:italic''>I <span style=''font-weight:bold; text-decoration:underline''>was floored</span> by the news.</span>\u000d\u000a</li>\u000d\u000a</ul>\u000d\u000a',2013,4,19)
 INSERT INTO LOGS VALUES(63,'to the tune of','used to emphasize a large amount of money\u000d\u000a\u000d\u000a<ul>\u000d\u000a<li>\u000d\u000aThey were present in GMO samples <span style=''font-weight:bold;font-style:italic''>to the tune of</span> 60 ppm.\u000d\u000a</li>\u000d\u000a</ul>',2013,4,19)
-INSERT INTO LOGS VALUES(64,'about-face','a complete change of attitude or opinion\u000d\u000a\u000d\u000a<ul>\u000d\u000a  <li>After saying that he didn''t want the job, he <span style=''color:blue; font-weight: bold; font-style:italic''>did an about-face</span> and accepted the offer.</li>\u000d\u000a</ul>\u000d\u000a\u000d\u000a<a href=''http://www.learnersdictionary.com/search/about-face''>More</a>',2013,4,22)
-INSERT INTO LOGS VALUES(65,'waterfowl','a duck or similar bird that swims and lives in or near water \u000d\u000a\u000d\u000a<ul>\u000d\u000a<li>\u000d\u000aThe lake is a refuge for migrating waterfowl.\u000d\u000a</li>\u000d\u000a</ul>',2013,4,22)
+INSERT INTO LOGS VALUES(67,'the ''clear'' command','Install the Cygwin package ncurses; it is in the Utils category.',2013,4,22)
 INSERT INTO TAGS VALUES(37,'tag2')
 INSERT INTO TAGS VALUES(38,'ggs')
 INSERT INTO TAGS VALUES(53,'english')
 INSERT INTO TAGS VALUES(54,'clojure')
+INSERT INTO TAGS VALUES(64,'kkk')
+INSERT INTO TAGS VALUES(65,'vgy')
+INSERT INTO TAGS VALUES(66,'cygwin')
 INSERT INTO LOG_TAGS VALUES(1,37)
 INSERT INTO LOG_TAGS VALUES(2,38)
 INSERT INTO LOG_TAGS VALUES(43,38)
+INSERT INTO LOG_TAGS VALUES(4,37)
+INSERT INTO LOG_TAGS VALUES(4,38)
 INSERT INTO LOG_TAGS VALUES(23,37)
 INSERT INTO LOG_TAGS VALUES(23,38)
 INSERT INTO LOG_TAGS VALUES(55,38)
-INSERT INTO LOG_TAGS VALUES(57,53)
 INSERT INTO LOG_TAGS VALUES(58,53)
 INSERT INTO LOG_TAGS VALUES(59,53)
 INSERT INTO LOG_TAGS VALUES(60,53)
@@ -97,7 +100,5 @@ INSERT INTO LOG_TAGS VALUES(63,53)
 INSERT INTO LOG_TAGS VALUES(46,38)
 INSERT INTO LOG_TAGS VALUES(3,37)
 INSERT INTO LOG_TAGS VALUES(3,38)
-INSERT INTO LOG_TAGS VALUES(4,37)
-INSERT INTO LOG_TAGS VALUES(4,38)
-INSERT INTO LOG_TAGS VALUES(64,53)
-INSERT INTO LOG_TAGS VALUES(65,53)
+INSERT INTO LOG_TAGS VALUES(57,53)
+INSERT INTO LOG_TAGS VALUES(67,66)
