@@ -1,7 +1,6 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.result
-  ;;(:use [org.joyframework servlet] )
   (:require [org.joyframework.session :as sess]
             [org.joyframework.request :as req]
             [org.joyframework.response :as resp]

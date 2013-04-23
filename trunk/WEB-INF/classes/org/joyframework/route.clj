@@ -1,7 +1,7 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.route
-  (:use [org.joyframework resources validation] )
+  (:use [org.joyframework resources] )
   (:require [clojure.string :as str]
             [org.joyframework.result :as r]
             [org.joyframework.session :as sess]
