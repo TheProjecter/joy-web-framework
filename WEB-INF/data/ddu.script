@@ -41,7 +41,7 @@ CREATE MEMORY TABLE PUBLIC.LOGS(ID BIGINT NOT NULL PRIMARY KEY,TITLE VARCHAR(128
 CREATE MEMORY TABLE PUBLIC.TAGS(ID BIGINT NOT NULL PRIMARY KEY,TAG VARCHAR(128))
 CREATE MEMORY TABLE PUBLIC.LOG_TAGS(LOG_ID BIGINT NOT NULL,TAG_ID BIGINT NOT NULL)
 ALTER SEQUENCE SYSTEM_LOBS.LOB_ID RESTART WITH 1
-ALTER SEQUENCE PUBLIC.SEQ RESTART WITH 68
+ALTER SEQUENCE PUBLIC.SEQ RESTART WITH 69
 SET DATABASE DEFAULT INITIAL SCHEMA PUBLIC
 GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.YES_OR_NO TO PUBLIC
 GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.TIME_STAMP TO PUBLIC
@@ -76,7 +76,8 @@ INSERT INTO LOGS VALUES(60,'tall order','something that is very difficult to do 
 INSERT INTO LOGS VALUES(61,'','',2013,4,19)
 INSERT INTO LOGS VALUES(62,'floor','<strong>:</strong> to surprise, shock or amaze (someone) very much, often used as <span style=''font-weight:bold''>be floored</span>\u000d\u000a\u000d\u000a<ul>\u000d\u000a<li>\u000d\u000a<span style=''font-style:italic''>I <span style=''font-weight:bold; text-decoration:underline''>was floored</span> by the news.</span>\u000d\u000a</li>\u000d\u000a</ul>\u000d\u000a',2013,4,19)
 INSERT INTO LOGS VALUES(63,'to the tune of','used to emphasize a large amount of money\u000d\u000a\u000d\u000a<ul>\u000d\u000a<li>\u000d\u000aThey were present in GMO samples <span style=''font-weight:bold;font-style:italic''>to the tune of</span> 60 ppm.\u000d\u000a</li>\u000d\u000a</ul>',2013,4,19)
-INSERT INTO LOGS VALUES(67,'the ''clear'' command','Install the Cygwin package ncurses; it is in the Utils category.',2013,4,22)
+INSERT INTO LOGS VALUES(67,'the ','Install the Cygwin package <span style=''text-decoration:underline; font-weight:bold''>ncurses</span>; it is in the Utils category.',2013,4,22)
+INSERT INTO LOGS VALUES(68,'Clojure: Destructuring','<a href=''http://blog.jayfields.com/2010/07/clojure-destructuring.html''>Here</a>',2013,4,22)
 INSERT INTO TAGS VALUES(37,'tag2')
 INSERT INTO TAGS VALUES(38,'ggs')
 INSERT INTO TAGS VALUES(53,'english')
@@ -102,3 +103,4 @@ INSERT INTO LOG_TAGS VALUES(3,37)
 INSERT INTO LOG_TAGS VALUES(3,38)
 INSERT INTO LOG_TAGS VALUES(57,53)
 INSERT INTO LOG_TAGS VALUES(67,66)
+INSERT INTO LOG_TAGS VALUES(68,54)
