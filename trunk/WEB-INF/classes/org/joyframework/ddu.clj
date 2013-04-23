@@ -33,12 +33,16 @@
 (defn- select-tags
   ([] (db/select ds ["select * from tags"]))
   ([checked]
-     (map (fn [tag] (assoc tag "checked"
-                           (some #(== (tag "id")
-                                      (if (string? %) (Integer/parseInt %) %))
-                                 (if (or (coll? checked)
-                                         (u/array? checked)) checked [checked]))))
-          (select-tags)))
+     (let [tags (select-tags)]
+       (if checked
+         (map (fn [tag] (assoc tag "checked"
+                               (some #(== (tag "id")
+                                          (if (string? %) (Integer/parseInt %) %))
+                                     (if (or (coll? checked)
+                                             (u/array? checked)) checked [checked]))))
+              tags)
+         tags)
+       ))
   )
 
 (defn- pages [page total per-page]
@@ -160,12 +164,11 @@
         :input #(rs/tiles "log-edit" req/*http-params* %
                           {"tags" (select-tags (req/param "tag"))})}
   POST-log-validate [id]
-  (let [err (vali/with-rules
-              (vali/rule {:field-name "title"}
-                         vali/required #(vali/length {:min 2 :max 20}))    
-              (vali/rule {:field-name "content"}
-                         vali/required #(vali/length {:max 2000})))]
-    (if (seq err) (assoc err "id" id)))
+  (vali/with-rules {"id" id}
+    (vali/rule {:field-name "title"}
+               vali/required #(vali/length {:min 2 :max 20}))    
+    (vali/rule {:field-name "content"}
+               vali/required #(vali/length {:max 2000})))
   )
 
 (defn POST-log [id]
@@ -200,9 +203,9 @@
            {"tag" (first (db/select ds ["select * from tags where id=?" id]))})
    ))
 
-(defn POST-tag-validate []
-  (println "POST-tag-validate")
-  (vali/required {:field-name "tag"})
+(defn ^{:tiles "tag"} POST-tag-validate [id]
+  (vali/with-rules {"id" id}
+    (vali/rule {:field-name "tag"} vali/required))
   )
 
 (defn POST-tag [id]
