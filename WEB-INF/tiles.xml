@@ -5,12 +5,11 @@
 <tiles-definitions>
   <definition name="t" template="/WEB-INF/jsps/classic.jsp">
     <put-attribute name="lmenu" value="/WEB-INF/jsps/lmenu.jsp" />
-    <put-attribute name="toolbar" />
+    <put-attribute name="toolbar" value='' />
     <put-attribute name="body" />
   </definition>
 
   <definition name="index" extends="t">
-    <put-attribute name="toolbar" value='' />
     <put-attribute name="body" value="/WEB-INF/jsps/index.jsp" />
   </definition>
 
@@ -42,6 +41,10 @@
 
   <definition name="tag" extends="tags">
     <put-attribute name='body' value='/WEB-INF/jsps/tag.jsp' />
+  </definition>
+
+  <definition name="validations" extends="t">
+    <put-attribute name='body' value='/WEB-INF/jsps/validations.jsp' />
   </definition>
 
 </tiles-definitions>

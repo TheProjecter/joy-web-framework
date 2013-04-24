@@ -1,6 +1,6 @@
 ; Copyright (c) Pengyu Yang. All rights reserved
 
-(ns ^{:path "/"} org.joyframework.welcome
+(ns ^{:path "/welcome"} org.joyframework.welcome
   (:require [org.joyframework.route :reload true :as route]
             [org.joyframework.result :reload true :as rs]))
 

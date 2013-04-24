@@ -18,12 +18,13 @@
 (def INDEX (symbol "index"))
 
 (declare get-route get-handler get-handler-from-path
-         checkbox validate valid-http-method? valid-token? invoke)
+         checkbox validate valid-http-method? token)
 
 (defn service
   ""
   [bss request response]
   (binding [*bootstraps* bss
+            util/*__jf_debug__* true
             resp/*http-response* response
             req/*http-request* request
             req/*http-params* (req/params request)
@@ -33,10 +34,12 @@
           [handler args ns] (get-handler (get-route p))]
       (flash/reinstate)
       (try
-        (if handler
-          (when (validate (meta handler) ns args)
+        (if-let [mh (meta handler)]
+          (when (and (token mh)
+                     (validate mh ns args)) 
             (req/set "__jf_src_page__" (str p (if q "?") q))
-            (apply handler args))
+            (apply handler args)
+            )
           (r/not-found))
         (catch Exception ex
           (if-let [h ('exception-handler *bootstraps*)] (h ex) (throw ex))
@@ -55,8 +58,7 @@
            redirect (r/redirect redirect errors)
            input (input errors)
            :else (r/redirect (req/param "__jf_src_page__") errors)
-           )
-          )
+           ))
         ))
   )
 
@@ -67,27 +69,22 @@
       (throw (RuntimeException. "invalid.http.method")))
     ))
 
-(defn- valid-token?
-  "Tests if the handler is callable. Returns true if the handler
-   can be invoked; otherwise false returned. "
-  [handler]
-  (if (:token (meta handler))
-       (let [tn (sess/get "__jf_tk_name__")
-          tv (sess/get "__jf_tk_value__")]
-      (sess/set "__jf_tk_name__" nil)
-      (if-not (= (req/param tn) tv)
-        (throw (RuntimeException. "invalid.token")))
-      )
-    )
-  )
+(defn- token ""
+  [mh]
+  (if-not (:token mh) true
+          (let [tn (sess/get "__jf_tk_name__") tv (sess/get "__jf_tk_value__")]
+            (sess/remove "__jf_tk_name__" "__jf_tk_value__")
+            (if (and tn tv (= (req/param tn) tv)) true
+              (throw (RuntimeException. "invalid.token"))))
+          ))
 
 (defn- checkbox "" [handler]
   (let [chks
         (reduce (fn [m [k v]]
                   (let [kn (name k) n (.substring kn 5)]
                     (if (nil? (req/param n)) (assoc m n v) m))) {}
-                (filter (fn [[k v]]
-                          (.startsWith (name k) "_chk_")) (meta handler)))]
+                    (filter (fn [[k v]]
+                              (.startsWith (name k) "_chk_")) (meta handler)))]
     (set! req/*http-params* (into req/*http-params* chks) ))
   )
 
