@@ -3,7 +3,7 @@
 <%@ taglib prefix='jf' tagdir='/WEB-INF/tags' %>
 
 <form method='post' action='${id}'>
-
+  <jf:token />
   <jf:srcPage />
   <jf:errors />
   

@@ -35,3 +35,7 @@
   ([x] (to-decimal x nil))
   ([x y] (to-number #(BigDecimal. x) y))
   )
+
+(def ^:dynamic *__jf_debug__* false)
+
+(defn debug [t & args] (if *__jf_debug__* (apply printf t args)))

@@ -197,8 +197,11 @@
 
 (defn GET-tag [id]
   (rs/tiles
-   "tag" (if (< 0 (Integer/parseInt id))
-           {"tag" (first (db/select ds ["select * from tags where id=?" id]))})
+   "tag" (conj {"id" id}
+               (if (< 0 (Integer/parseInt id))
+                 (let [t (first (db/select ds ["select * from tags where id=?" id]))]
+                   {"tag" (t "tag")})
+                 )) 
    ))
 
 (defn ^{:tiles "tag"} POST-tag-validate [id]
@@ -206,7 +209,7 @@
     (vali/rule {:field-name "tag"} vali/required #(vali/length {:min 3 :max 20})))
   )
 
-(defn POST-tag [id]
+(defn ^:token POST-tag [id]
   (let [insert? (<= (Integer/parseInt id) 0)
         tid (if insert? (next-id) id)
         tag (req/param "tag")]
@@ -237,3 +240,36 @@
       (delete-log-tags {:log id}))
     (GET-logs)
     ))
+
+(defn GET-validations []
+  (rs/tiles "validations"))
+
+(defmulti POST-validations (fn [x] x))
+
+(defmethod POST-validations "date" [_]
+  (println "date")
+  )
+
+(defmethod POST-validations "date-before" [_]
+  (println "date-before")
+  )
+
+(defmethod POST-validations "date-after" [_]
+  (println "date-after")
+  )
+
+(defmulti ^{:tiles "validations"} POST-validations-validate (fn [x] x))
+
+(defmethod POST-validations-validate "date" [_]
+  (vali/with-rules
+    (vali/rule {:field-name "date"} vali/required)
+    )
+  )
+
+(defmethod POST-validations-validate "date-before" [_]
+  (println "validate-date-before")
+  )
+
+(defmethod POST-validations-validate "date-after" [_]
+  (println "validate-date-after")
+  )
