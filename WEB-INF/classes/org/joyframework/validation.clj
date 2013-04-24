@@ -23,9 +23,9 @@
 
 (defn required
   ([] (required true))
-  ([tr]
+  ([tr?]
      (let [{:keys [key] :or {key "vali.required"}} *field-spec*]
-       (if (empty? (if tr *trimmed-value* *value*))
+       (if (empty? (if tr? *trimmed-value* *value*))
          (res/get-message key *field-label*))
        ))
   )
@@ -41,10 +41,10 @@
 
 (defn length "min <= length < max"
   ([m] (length true m)) 
-  ([tr {:keys [min max]}]
+  ([tr? {:keys [min max]}]
      (let [{:keys [k kmin kmax] :or {k "vali.length" kmin "vali.length.min"
                                      kmax "vali.length.max"}} *field-spec*]
-       (within (count (if tr *trimmed-value* *value*)) min max k kmin kmax)))
+       (within (count (if tr? *trimmed-value* *value*)) min max k kmin kmax)))
   )
 
 (defn minlength [len] (length {:min len}))
@@ -78,6 +78,10 @@
   ([{:keys [min max]}]
      (check-number u/to-decimal "vali.decimal" min max))
   )
+
+(defn option [])
+
+(defn options [])
 
 (defn date [{:keys [format before after]}])
 

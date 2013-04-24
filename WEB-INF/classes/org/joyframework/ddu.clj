@@ -1,6 +1,6 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
-(ns ^{:path "/"} org.joyframework.ddu
+(ns ^{:path "/" :res-key res} org.joyframework.ddu
     (:require [org.joyframework.route :reload true :as route]
               [org.joyframework.result :reload true :as rs]
               [org.joyframework.resources :reload true :as res]
@@ -12,9 +12,7 @@
               [clj-time.core :as dt]
               [clojure.java.jdbc :as sql]))
 
-(route/defroutes rt org.joyframework.ddu)
-
-(res/load-resources :res 'org.joyframework.ddu)
+(route/defroutes __jf_rt__ org.joyframework.ddu)
 
 (db/defds ds {:driver "org.hsqldb.jdbc.JDBCDriver"
               :subprotocol "hsqldb"
@@ -205,7 +203,7 @@
 
 (defn ^{:tiles "tag"} POST-tag-validate [id]
   (vali/with-rules {"id" id}
-    (vali/rule {:field-name "tag"} vali/required))
+    (vali/rule {:field-name "tag"} vali/required #(vali/length {:min 3 :max 20})))
   )
 
 (defn POST-tag [id]
