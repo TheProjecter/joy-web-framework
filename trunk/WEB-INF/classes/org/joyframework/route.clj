@@ -4,6 +4,7 @@
   (:use [org.joyframework resources] )
   (:require [clojure.string :as str]
             [org.joyframework.result :as r :reload true]
+            [org.joyframework.resources :as res :reload true]
             [org.joyframework.session :as sess]
             [org.joyframework.request :as req]
             [org.joyframework.response :as resp :reload true]
@@ -92,7 +93,7 @@
 
 (defn- get-route ""
   [p]
-  (loop [[r & rs :as path] (str/split p #"/") m (var-get ('rt *bootstraps*))]
+  (loop [[r & rs :as path] (str/split p #"/") m (var-get ('__jf_rt__ *bootstraps*))]
     (if-let [sub-rt (m r)]
       (recur rs sub-rt) (assoc m :path path)))
   )
@@ -135,13 +136,16 @@
 (defn- load-ns
   "Finds the namespace indicated by the given symbol. If the 
    given namespace is not found, tries loading the namespace and
-   returns it."
+   returns it. It also loads the resources if the resource key
+   is specified in the meta data of the namespace."
   [s]
-  (try (or (find-ns s)
-           (do (require s) (find-ns s)))
-       (catch FileNotFoundException e
-         (throw (IllegalArgumentException.
-                 (str "Unable to find namespace " s))))))
+  (when-let [the-ns (try (or (find-ns s) (do (require s) (find-ns s)))
+                         (catch FileNotFoundException e
+                           (throw (IllegalArgumentException.
+                                   (str "Unable to find namespace " s)))))]
+    (if-let [rk (:res-key (meta the-ns))]
+      (res/load-resources (keyword rk) (ns-name the-ns)))
+    the-ns))
 
 (defn defroutes*
   "Usage: (defroutes* '[a.b.c d e] 'x.y.z)"
