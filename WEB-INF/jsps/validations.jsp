@@ -3,8 +3,8 @@
 
 <jf:errors />
 
-<form action='validations/date' method='post'>
-  <input type='text' name='date' />
+<form action='/ddu/joy/validations/date' method='post'>
+  <input type='text' name='date' value='${date}' />
   <input type='submit' value='${res["submit"]}' />
 </form>
 

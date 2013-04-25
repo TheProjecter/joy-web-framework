@@ -126,7 +126,7 @@
   )
 
 (defn POST-logs-validate []
-  (vali/with-rules nil
+  (vali/with-rules
     (vali/rule {:field-name "year"} vali/integer)
     (vali/rule {:field-name "month"} #(vali/integer {:min 0 :max 13})))
   )
@@ -262,7 +262,9 @@
 
 (defmethod POST-validations-validate "date" [_]
   (vali/with-rules
-    (vali/rule {:field-name "date"} vali/required)
+    (vali/rule {:field-name "date"
+                :field-label "Date"
+                :formats "yyyy/MM/dd"} vali/required vali/date)
     )
   )
 
