@@ -83,7 +83,19 @@
 
 (defn options [])
 
-(defn date [{:keys [format before after]}])
+;;(defn date [{:keys [format before after]}])
+(defn date []
+  (let [{:keys [key formats]
+         :or {key "vali.date" formats ["yyyy-MM-dd" "yyyy/MM/dd"]}} *field-spec*]
+    (if-not (u/date *trimmed-value* formats)
+      (res/get-message key *field-label* formats)
+      ) 
+    )
+  )
+
+(defn date-before [])
+
+(defn date-after [])
 
 (defn email [])
 
@@ -110,7 +122,10 @@
   (assoc m k (if-let [v (m k)]
                (conj (if (vector? v) v [v]) val) val)))
 
-(defn with-rules [params & rules]
-  (let [errs (reduce (fn [m rule]
-                       (if-let [[k msg] (rule)] (put m k msg) m)) {} rules)]
-    (if (seq errs) (into errs params))))
+(defn with-rules [& rules]
+  (let [err (reduce (fn [m rule]
+                      (if-let [[k msg] (rule)] (put m k msg) m))
+                    {} (filter #(fn? %) rules))]
+    (if (seq err)
+      (apply merge err (filter #(map? %) rules)))
+    ))

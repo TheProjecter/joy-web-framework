@@ -1,7 +1,9 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.util
-  (:import java.math.BigDecimal))
+  (:import java.math.BigDecimal
+           java.text.SimpleDateFormat
+           java.text.ParseException))
 
 (defn trim-slashes "Trims slashes from both ends of the given string argument."
   [s]
@@ -34,6 +36,19 @@
 (defn to-decimal
   ([x] (to-decimal x nil))
   ([x y] (to-number #(BigDecimal. x) y))
+  )
+
+(defn- date* [ds fmt]
+  (try (.parse (SimpleDateFormat. fmt) ds) (catch ParseException pe)))
+
+(defn date
+  ([ds fmt]
+     (if (string? fmt) (date* ds fmt)
+         (if (coll? fmt) (some #(date* ds %) fmt)))
+     )
+  ([ds fmt & xs]
+     (date ds (cons fmt xs))
+     )
   )
 
 (def ^:dynamic *__jf_debug__* false)
