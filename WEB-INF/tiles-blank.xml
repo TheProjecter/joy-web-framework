@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+"http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<!-- Sample Tiles configuration -->
+
+<tiles-definitions>
+
+  <!--definition name="t" template="A template JSP"> 
+    <put-attribute name="body" />
+  </definition>
+
+  <definition name="index" extends="t">
+    <put-attribute name="body" value="/WEB-INF/jsps/index.jsp" />
+  </definition-->
+
+</tiles-definitions>
