@@ -7,3 +7,5 @@
 (route/defroutes __jf_rt__ org.joyframework.blank)
 
 (defn index [] (rs/ok "Being Joyful!"))
+
+(defn hello [] (rs/tiles "hello"))

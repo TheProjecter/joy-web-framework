@@ -30,11 +30,13 @@
   </target>
 
   <target name='build-blank-war' depends='build' >
-    <mkdir dir='${blank.war.dir}' />
     <mkdir dir='${blank.war.dir}/WEB-INF' />
 
-    <copy file='web-blank.xml' tofile='${blank.war.dir}/WEB-INF/web.xml' />
-    <copy file='tiles-blank.xml' tofile='${blank.war.dir}/WEB-INF/tiles.xml' />
+    <copy todir='${blank.war.dir}' file='${blank.webapp.dir}/index.jsp' />
+
+    <copy todir='${blank.war.dir}/WEB-INF'>
+      <fileset dir='${blank.webapp.dir}' includes='*.xml' />
+    </copy>
 
     <copy todir='${blank.war.dir}/WEB-INF/lib' >
       <fileset dir='lib' />
@@ -50,48 +52,4 @@
     <delete dir='${blank.war.dir}' />
   </target>
 
-  <!--target name='build-blank-webapp' depends='build'>
-    <property name='blank' value='blank' />
-    <mkdir dir='${blank}' />
-    <mkdir dir='${blank}/WEB-INF' />
-
-    <property name='myapp.lib' value='${blank}/WEB-INF/lib' />
-    <copy todir='${myapp.lib}' >
-      <fileset dir='lib' includes='*.jar' />
-    </copy>
-    <copy file='${joy.jar}' todir='${myapp.lib}' />
-
-    <copy file='myapp.web.xml'
-          tofile='${blank}/WEB-INF/web.xml' />
-
-    <copy file='myapp.tiles.xml'
-          tofile='${blank}/WEB-INF/tiles.xml' />
-
-    <property name='myapp.classes'
-              value='${blank}/WEB-INF/classes/myapp' />
-    <mkdir dir='${myapp.classes}' />
-    <copy file='myapp.bootstrap.clj'
-          tofile='${myapp.classes}/bootstrap.clj' />
-    <copy file='myapp.index.clj'
-          tofile='${myapp.classes}/index.clj' />
-    <copy file='myapp.resources.properties'
-          tofile='${myapp.classes}/resources.properties' />
-
-    <property name='myapp.jsps' value='${blank}/WEB-INF/jsps' />
-    <mkdir dir='${myapp.jsps}' />
-    <copy file='myapp.classic.jsp'
-          tofile='${myapp.jsps}/classic.jsp' />
-    <copy file='myapp.index.jsp'
-          tofile='${myapp.jsps}/index.jsp' />
-    <copy file='myapp.header.jsp'
-          tofile='${myapp.jsps}/header.jsp' />
-    <copy file='myapp.left.jsp'
-          tofile='${myapp.jsps}/left.jsp' />
-    <copy file='myapp.footer.jsp'
-          tofile='${myapp.jsps}/footer.jsp' />
-
-    <war destfile='${blank.webapp}'
-         basedir='blank' />
-    
-  </target-->
 </project>

@@ -7,12 +7,8 @@
 
 <tiles-definitions>
 
-  <!--definition name="t" template="A template JSP"> 
-    <put-attribute name="body" />
+  <definition name="hello" template="/index.jsp"> 
+    <put-attribute name="message" value="Welcome To JWF!" />
   </definition>
-
-  <definition name="index" extends="t">
-    <put-attribute name="body" value="/WEB-INF/jsps/index.jsp" />
-  </definition-->
 
 </tiles-definitions>
