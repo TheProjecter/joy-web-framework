@@ -7,6 +7,8 @@
             [org.joyframework.util :as u]
             [org.joyframework.datetime :as dt]
             [clojure.string :as str])
+  (:import (org.joda.time DateTime)
+           (java.util Date Calendar))
   )
 
 (def __jf_page_err__ "__jf_page_err__")
@@ -84,19 +86,27 @@
 
 (defn options [])
 
-;;(defn date [{:keys [format before after]}])
+(def __jf_date_format__ ["yyyy-MM-dd" "yyyy/MM/dd" "yyyyMMdd"])
+
+(defn- datetime [x]
+  (cond (fn? x) (x) (= :now x) (DateTime.) :else (DateTime. x)))
+
 (defn date []
-  (let [{:keys [key formats]
-         :or {key "vali.date" formats ["yyyy-MM-dd" "yyyy/MM/dd"]}} *field-spec*]
-    (if-not (u/date *trimmed-value* formats)
-      (res/get-message key *field-label* formats)
-      ) 
-    )
-  )
-
-(defn date-before [])
-
-(defn date-after [])
+  (let [{:keys [key formats after before key-before key-after]
+         :or {key "vali.date" formats __jf_date_format__
+              key-before "vali.date.before"
+              key-after "vali.date.after"}} *field-spec*]
+    (if-let [d (dt/parse *trimmed-value* formats)]
+      (cond
+       (and before (dt/after? d (datetime before)))
+         (res/get-message key-before *field-label*
+                          (if (= :now before) "now" before))
+       (and after (dt/before? d (datetime after)))
+         (res/get-message key-after *field-label*
+                          (if (= :now after) "now" after))
+       :else nil)
+      (res/get-message key *field-label* formats)) 
+    ))
 
 (defn email [])
 

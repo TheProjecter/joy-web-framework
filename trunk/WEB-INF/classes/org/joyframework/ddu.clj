@@ -9,10 +9,12 @@
               [org.joyframework.request :reload true :as req]
               [org.joyframework.validation :reload true :as vali]
               [org.joyframework.util :reload true :as u]
-              [clj-time.core :as dt]
+              [org.joyframework.datetime :reload true :as dt]
               [clojure.java.jdbc :as sql]))
 
 (route/defroutes __jf_rt__ org.joyframework.ddu)
+
+(alter-var-root #'vali/__jf_date_format__ (fn [x] "yyyy-MM-dd"))
 
 (db/defds ds {:driver "org.hsqldb.jdbc.JDBCDriver"
               :subprotocol "hsqldb"
@@ -25,8 +27,6 @@
   (if-let [p (req/param "page")] (sess/set "page" p) (sess/get "page" "1")))
 
 (defn- next-id [] (first (vals (first (db/select ds ["call next value for seq"])))))
-
-(defn- today [] (let [d (dt/today)] [(dt/year d) (dt/month d) (dt/day d)]))
 
 (defn- select-tags
   ([] (db/select ds ["select * from tags"]))
@@ -178,7 +178,7 @@
   (let [[insert? log tags] (log-from-request id)]
     (sql/with-connection {:datasource ds}
       (if insert?
-        (let [[y m d] (today)]
+        (let [[y m d] (dt/today)]
           (sql/insert-record "logs" (assoc log :year y :month m :date d)))
         (let [id (:id log)]
           (sql/update-values "logs" ["id=?" id] log)
@@ -247,7 +247,7 @@
 (defmulti POST-validations (fn [x] x))
 
 (defmethod POST-validations "date" [_]
-  (println "date")
+  (rs/tiles "validations" {"date" (req/param "date") "validDate" true})
   )
 
 (defmethod POST-validations "date-before" [_]
@@ -262,10 +262,8 @@
 
 (defmethod POST-validations-validate "date" [_]
   (vali/with-rules
-    (vali/rule {:field-name "date"
-                :field-label "Date"
-                :formats "yyyy/MM/dd"} vali/required vali/date)
-    )
+    (vali/rule {:field-name "date" :field-label "Input"
+                :after "2010-5-1" :before :now} vali/required vali/date))
   )
 
 (defmethod POST-validations-validate "date-before" [_]

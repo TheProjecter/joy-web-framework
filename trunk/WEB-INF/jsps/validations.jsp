@@ -1,19 +1,30 @@
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix='jf' tagdir='/WEB-INF/tags' %>
 
 <jf:errors />
 
-<form action='/ddu/joy/validations/date' method='post'>
-  <input type='text' name='date' value='${date}' />
-  <input type='submit' value='${res["submit"]}' />
-</form>
+<table>
+  <tr><td>
+    <form action='/ddu/joy/validations/date' method='post'>
+      <input type='text' name='date' value='${date}' />
+      <input type='submit' value='${res["submit"]}' />
+    </form>
+    <c:if test='${validDate}'> You provided a valid date: ${date} </c:if>
+  </td></tr>
 
-<form action='validations/date-before' method='post'>
-  <input type='text' name='date' />
-  <input type='submit' value='${res["submit"]}' />
-</form>
+  <tr ><td style='height: 20px'> </td></tr>
 
-<form action='validations/date-after' method='post'>
-  <input type='text' name='date' />
-  <input type='submit' value='${res["submit"]}' />
-</form>
+  <tr><td>
+    <form action='validations/date-before' method='post'>
+      <input type='text' name='date' />
+      <input type='submit' value='${res["submit"]}' />
+    </form>
+  </td></tr>
+
+  <tr><td>
+    <form action='validations/date-after' method='post'>
+      <input type='text' name='date' />
+      <input type='submit' value='${res["submit"]}' />
+    </form>
+  </td></tr>
+</table>
