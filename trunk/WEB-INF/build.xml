@@ -24,6 +24,7 @@
     <jar destfile="${joy.jar}" basedir="classes"
          includes="**/JoyServlet.class, **/*.clj,
                    **/resources.properties"
+         excludes="**/blank.clj, **/ddu.clj"
          />
   </target>
 
