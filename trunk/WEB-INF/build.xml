@@ -21,6 +21,7 @@
   </target>
 
   <target name="build">
+    <mkdir dir='${build.dir}' />
     <jar destfile="${joy.jar}" basedir="classes"
          includes="**/JoyServlet.class, **/*.clj,
                    **/resources.properties"
@@ -28,10 +29,25 @@
          />
   </target>
 
-  <target name='build-blank-webapp' depends='build' >
-    <move file='${joy.jar}' todir='lib' />
-    <war destfile='${blank.webapp}' basedir='..' />
-    <delete file='lib/${joy.jar}' />
+  <target name='build-blank-war' depends='build' >
+    <mkdir dir='${blank.war.dir}' />
+    <mkdir dir='${blank.war.dir}/WEB-INF' />
+
+    <copy file='web-blank.xml' tofile='${blank.war.dir}/WEB-INF/web.xml' />
+    <copy file='tiles-blank.xml' tofile='${blank.war.dir}/WEB-INF/tiles.xml' />
+
+    <copy todir='${blank.war.dir}/WEB-INF/lib' >
+      <fileset dir='lib' />
+    </copy>
+    <copy file='${joy.jar}' todir='${blank.war.dir}/WEB-INF/lib' />
+
+    <mkdir dir='${blank.war.dir}/WEB-INF/classes/org/joyframework' />
+    <copy file='classes/org/joyframework/blank.clj'
+          todir='${blank.war.dir}/WEB-INF/classes/org/joyframework' />
+
+    <war destfile='${blank.war}' basedir='${blank.war.dir}' />
+
+    <delete dir='${blank.war.dir}' />
   </target>
 
   <!--target name='build-blank-webapp' depends='build'>
