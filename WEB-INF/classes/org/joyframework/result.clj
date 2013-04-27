@@ -5,7 +5,8 @@
             [org.joyframework.request :as req]
             [org.joyframework.response :as resp]
             [org.joyframework.context :as ctxt]
-            [org.joyframework.flash :as flash])
+            [org.joyframework.flash :as flash]
+            [clojure.data.json :as json])
   (:import org.apache.tiles.servlet.context.ServletUtil))
 
 (defn ok
@@ -57,13 +58,19 @@
                req/*http-request* resp/*http-response*)) 
   )
 
+(defn json []
+  (println (json/write-str {:abc "ABC"}) )
+  )
+
 (defn tiles
   ([id] (tiles id {}))
   ([id http-attrs & x] (tiles id (apply merge http-attrs x)))
   ([id http-attrs]
+     (json)
      (let [args (object-array 2)]
        (aset args 0 req/*http-request*)
        (aset args 1 resp/*http-response*)
        (req/set http-attrs)
        (.render (ServletUtil/getContainer ctxt/*servlet-context*) id args)))
   )
+
