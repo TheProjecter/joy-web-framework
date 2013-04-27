@@ -128,7 +128,7 @@
 (defn POST-logs-validate []
   (vali/with-rules
     (vali/rule {:field-name "year"} vali/integer)
-    (vali/rule {:field-name "month"} #(vali/integer {:min 0 :max 13})))
+    (vali/rule {:field-name "month" :min 0 :max 13} vali/integer))
   )
 
 (defn POST-logs []
@@ -169,8 +169,8 @@
                           {"tags" (select-tags (req/param "tag"))})}
   POST-log-validate [id]
   (vali/with-rules {"id" id}
-    (vali/rule {:field-name "title"} vali/required #(vali/maxlength 50))
-    (vali/rule {:field-name "content"} vali/required #(vali/maxlength 2000))
+    (vali/rule {:field-name "title" :max 50} vali/required vali/length)
+    (vali/rule {:field-name "content" :max 2000} vali/required vali/length)
     (vali/rule {:field-name "tag"} vali/required))
   )
 
@@ -206,7 +206,7 @@
 
 (defn ^{:tiles "tag"} POST-tag-validate [id]
   (vali/with-rules {"id" id}
-    (vali/rule {:field-name "tag"} vali/required #(vali/length {:min 3 :max 20})))
+    (vali/rule {:field-name "tag" :min 3 :max 20} vali/required vali/length))
   )
 
 (defn ^:token POST-tag [id]

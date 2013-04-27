@@ -40,9 +40,9 @@
   (let [d (ctc/today)] [(ctc/year d) (ctc/month d) (ctc/day d)]))
 
 (defn before? [#^DateTime this #^DateTime that]
-  (println "before? this:" this ", that:" that)
+  ;;(println "before? this:" this ", that:" that)
   (ctc/before? this that))
 
 (defn after? [#^DateTime this #^DateTime that]
-  (println "after? this:" this ", that:" that)
+  ;;(println "after? this:" this ", that:" that)
   (ctc/after? this that))

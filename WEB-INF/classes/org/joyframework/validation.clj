@@ -43,44 +43,30 @@
    ))
 
 (defn length "min <= length < max"
-  ([m] (length true m)) 
-  ([tr? {:keys [min max]}]
-     (let [{:keys [k kmin kmax] :or {k "vali.length" kmin "vali.length.min"
-                                     kmax "vali.length.max"}} *field-spec*]
+  ([] (length true))
+  ([tr?]
+     (let [{:keys [k kmin kmax max min]
+            :or {k "vali.length" kmin "vali.length.min"
+                 kmax "vali.length.max"}} *field-spec*]
        (within (count (if tr? *trimmed-value* *value*)) min max k kmin kmax)))
   )
 
-(defn minlength [len] (length {:min len}))
-
-(defn maxlength [len] (length {:max len}))
-
-(defn- check-number [f ky min max]
+(defn- check-number [f ky]
   (if-not (empty? *trimmed-value*)
     (let [n (f *trimmed-value* (res/get-message ky *field-label*))]
       (if (not (number? n)) n
-          (let [{:keys [k kmin kmax] :or {k "vali.between" kmin "vali.min"
-                                          kmax "vali.kmax"}} *field-spec*]
+          (let [{:keys [k kmin kmax min max]
+                 :or {k "vali.between" kmin "vali.min"
+                      kmax "vali.kmax"}} *field-spec*]
             (within n min max k kmin kmax))
           ))
     ))
 
-(defn integer
-  ([] (integer nil))
-  ([{:keys [min max]}]
-     (check-number u/to-int "vali.int" min max))
-  )
+(defn integer [] (check-number u/to-int "vali.int"))
 
-(defn double [{:keys [min max]}]
-  ([] (double nil))
-  ([{:keys [min max]}]
-     (check-number u/to-double "vali.decimal" min max))
-  )
+(defn double [] (check-number u/to-double "vali.decimal"))
 
-(defn decimal [{:keys [min max]}]
-  ([] (decimal nil))
-  ([{:keys [min max]}]
-     (check-number u/to-decimal "vali.decimal" min max))
-  )
+(defn decimal [] (check-number u/to-decimal "vali.decimal"))
 
 (defn option [])
 
@@ -103,8 +89,7 @@
                           (if (= :now before) "now" before))
        (and after (dt/before? d (datetime after)))
          (res/get-message key-after *field-label*
-                          (if (= :now after) "now" after))
-       :else nil)
+                          (if (= :now after) "now" after)))
       (res/get-message key *field-label* formats)) 
     ))
 
