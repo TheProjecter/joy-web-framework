@@ -24,6 +24,9 @@
          (.close)))
   )
 
+(defn json [data]
+  (ok (json/write-str data) "application/json"))
+
 (defn error 
   ([sc] (error sc ""))
   ([sc msg] (error sc msg {}))
@@ -58,15 +61,10 @@
                req/*http-request* resp/*http-response*)) 
   )
 
-(defn json []
-  (println (json/write-str {:abc "ABC"}) )
-  )
-
 (defn tiles
   ([id] (tiles id {}))
   ([id http-attrs & x] (tiles id (apply merge http-attrs x)))
   ([id http-attrs]
-     (json)
      (let [args (object-array 2)]
        (aset args 0 req/*http-request*)
        (aset args 1 resp/*http-response*)
