@@ -1,9 +1,10 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.util
+  (:require [org.joyframework.validation :as vali])
   (:import java.math.BigDecimal
-           java.text.SimpleDateFormat
-           java.text.ParseException))
+           (java.text SimpleDateFormat ParseException) 
+           (java.util.regex Pattern Matcher)))
 
 (defn trim-slashes "Trims slashes from both ends of the given string argument."
   [s]
@@ -38,19 +39,18 @@
   ([x y] (to-number #(BigDecimal. x) y))
   )
 
-(defn- date* [ds fmt]
-  (try (.parse (SimpleDateFormat. fmt) ds) (catch ParseException pe)))
+(defn config* [v val]
+  (alter-var-root v (fn [x]
+                      (cond (fn? val) (val)
+                            :else val)
+                      )))
 
-(defn date
-  ([ds fmt]
-     (if (string? fmt) (date* ds fmt)
-         (if (coll? fmt) (some #(date* ds %) fmt)))
-     )
-  ([ds fmt & xs]
-     (date ds (cons fmt xs))
-     )
-  )
-
-(def ^:dynamic *__jf_debug__* false)
-
-(defn debug [t & args] (if *__jf_debug__* (apply printf t args)))
+(defn config [& xs]
+  (let [conf (apply hash-map xs)
+        email-pattern (:email-pattern conf)
+        date-format (:date-format conf)]
+    (cond email-pattern (config* #'vali/__jf_email_pattern__
+                                 #(Pattern/compile email-pattern))
+          date-format (config* #'vali/__jf_date_format__ date-format)
+          )
+    ))

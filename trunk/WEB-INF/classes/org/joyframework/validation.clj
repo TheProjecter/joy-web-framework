@@ -8,7 +8,8 @@
             [org.joyframework.datetime :as dt]
             [clojure.string :as str])
   (:import (org.joda.time DateTime)
-           (java.util Date Calendar))
+           (java.util Date Calendar)
+           (java.util.regex Matcher Pattern))
   )
 
 (def __jf_page_err__ "__jf_page_err__")
@@ -93,7 +94,22 @@
       (res/get-message key *field-label* formats)) 
     ))
 
-(defn email [])
+
+(def __jf_email_pattern__
+  (Pattern/compile (str "^['_a-z0-9-\\+](\\.['_a-z0-9-\\+])*@"
+                        "[a-z0-9-](\\.[a-z0-9-])*\\."
+                        "([a-z]{2}|aero|arpa|asia|biz|com|coop|edu|gov|"
+                        "info|int|jobs|mil|mobi|museum|name|nato|net|"
+                        "org|pro|tel|travel|xxx)$")))
+
+(defn email
+  ([] (email true))
+  ([tr?]
+     (let [{:keys [key] :or {key "vali.email"}} *field-spec*
+           val (if tr? *trimmed-value* *value*)]
+       (if-not (.matches (.matcher __jf_email_pattern__ val))
+         (res/get-message key *field-label*))))
+  )
 
 (defn regex [patt])
 

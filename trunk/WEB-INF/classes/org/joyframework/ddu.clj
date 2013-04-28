@@ -14,7 +14,7 @@
 
 (route/defroutes __jf_rt__ org.joyframework.ddu)
 
-(alter-var-root #'vali/__jf_date_format__ (fn [x] "yyyy-MM-dd"))
+(u/config :date-format "yyyy-MM-dd")
 
 (db/defds ds {:driver "org.hsqldb.jdbc.JDBCDriver"
               :subprotocol "hsqldb"
@@ -250,8 +250,8 @@
   (rs/tiles "validations" {"date" (req/param "date") "validDate" true})
   )
 
-(defmethod POST-validations "date-before" [_]
-  (println "date-before")
+(defmethod POST-validations "email" [_]
+  (rs/tiles "validations" {"email" (req/param "email") "validEmail" true})
   )
 
 (defmethod POST-validations "date-after" [_]
@@ -266,8 +266,9 @@
                 :after "2010-5-1" :before :now} vali/required vali/date))
   )
 
-(defmethod POST-validations-validate "date-before" [_]
-  (println "validate-date-before")
+(defmethod POST-validations-validate "email" [_]
+  (vali/with-rules
+    (vali/rule {:field-name "email" :field-label "Email"} vali/required vali/email))
   )
 
 (defmethod POST-validations-validate "date-after" [_]
