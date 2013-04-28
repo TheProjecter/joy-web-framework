@@ -34,17 +34,7 @@
     <servlet-name>joy</servlet-name>
     <!--url-pattern>/*</url-pattern-->
     <url-pattern>/joy/*</url-pattern>
-    <!--url-pattern>/clay/*</url-pattern-->
   </servlet-mapping>
-
-  <!--login-config>
-    <auth-method>FORM</auth-method>
-    <realm-name>Test JAAS Realm</realm-name>
-    <form-login-config>
-      <form-login-page>/login.jsp</form-login-page>
-      <form-error-page>/login_error.jsp</form-error-page>
-    </form-login-config>
-    </login-config-->
 
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>

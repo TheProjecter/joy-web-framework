@@ -30,12 +30,16 @@
   </target>
 
   <target name='build-blank-war' depends='build' >
-    <mkdir dir='${blank.war.dir}/WEB-INF' />
+    <mkdir dir='${blank.war.dir}/WEB-INF/tags' />
 
     <copy todir='${blank.war.dir}' file='${blank.webapp.dir}/index.jsp' />
 
     <copy todir='${blank.war.dir}/WEB-INF'>
       <fileset dir='${blank.webapp.dir}' includes='*.xml' />
+    </copy>
+
+    <copy todir='${blank.war.dir}/WEB-INF/tags'>
+      <fileset dir='tags' includes='*' />
     </copy>
 
     <copy todir='${blank.war.dir}/WEB-INF/lib' >

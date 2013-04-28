@@ -11,16 +11,15 @@
     </form>
     <c:if test='${validDate}'> You provided a valid date: ${date} </c:if>
   </td></tr>
-
   <tr ><td style='height: 20px'> </td></tr>
-
   <tr><td>
-    <form action='validations/date-before' method='post'>
-      <input type='text' name='date' />
+    <form action='/ddu/joy/validations/email' method='post'>
+      <input type='text' name='email' value='${email}' />
       <input type='submit' value='${res["submit"]}' />
     </form>
+    <c:if test='${validEmail}'> You provided a valid email: ${email} </c:if>
   </td></tr>
-
+  <tr ><td style='height: 20px'> </td></tr>
   <tr><td>
     <form action='validations/date-after' method='post'>
       <input type='text' name='date' />
