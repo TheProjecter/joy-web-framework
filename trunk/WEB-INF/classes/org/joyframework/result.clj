@@ -24,8 +24,7 @@
          (.close)))
   )
 
-(defn json [data]
-  (ok (json/write-str data) "application/json"))
+(defn json [data] (ok (json/write-str data) "application/json"))
 
 (defn error 
   ([sc] (error sc ""))
