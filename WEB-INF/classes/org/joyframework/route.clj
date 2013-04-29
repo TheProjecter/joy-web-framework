@@ -24,7 +24,6 @@
   ""
   [bss request response]
   (binding [*bootstraps* bss
-            util/*__jf_debug__* true
             resp/*http-response* response
             req/*http-request* request
             req/*http-params* (req/params request)

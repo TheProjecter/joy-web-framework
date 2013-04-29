@@ -10,11 +10,12 @@
               [org.joyframework.validation :reload true :as vali]
               [org.joyframework.util :reload true :as u]
               [org.joyframework.datetime :reload true :as dt]
+              [org.joyframework.config :reload true :as cf]
               [clojure.java.jdbc :as sql]))
 
 (route/defroutes __jf_rt__ org.joyframework.ddu)
 
-(u/config :date-format "yyyy-MM-dd")
+(cf/config :date-format "yyyy-MM-dd")
 
 (db/defds ds {:driver "org.hsqldb.jdbc.JDBCDriver"
               :subprotocol "hsqldb"
@@ -274,3 +275,7 @@
 (defmethod POST-validations-validate "date-after" [_]
   (println "validate-date-after")
   )
+
+(defn GET-upload [])
+
+(defn ^{:before (fn []) :after (fn [])} ^:upload POST-upload []) 
