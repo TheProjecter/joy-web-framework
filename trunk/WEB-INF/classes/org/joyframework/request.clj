@@ -2,10 +2,21 @@
 
 (ns org.joyframework.request
   (:require [clojure.string :as str]
-            [org.joyframework.util :as util]))
+            [org.joyframework.util :as util])
+  (:import org.apache.commons.fileupload.servlet.ServletFileUpload))
 
 (def ^:dynamic *http-request*)
 (def ^:dynamic *http-params*)
+
+(defn multipart? [req] (ServletFileUpload/isMultipartContent req))
+
+(defn params "Gets the HTTP request parameters map."
+  [req]
+  (let [params (into {} (.getParameterMap req)) 
+        parts (if (multipart? req) (into {} (.getPartsMap req)))]
+    (into {} (for [[k v] (merge params parts)]
+               [k (if (== 1 (alength v)) (aget v 0) v)]))
+    ))
 
 (defn set
   ([m] (doseq [[n v] m] (set n v)))
@@ -23,16 +34,9 @@
   ([f name & xs] (map (if f (comp f param) param) (cons name xs)))
   )
 
-(defn params "Gets the HTTP request parameters map."
-  [request]
-  (let [params (.getParameterMap request)]
-    (into {} (for [[k v] params] [k (if (== 1 (alength v)) (aget v 0) v)]))
-    ))
-
 (defn path []
   (let [path-info (or (.getPathInfo *http-request*) "/")
         servlet-path (.getServletPath *http-request*)]
-    ;;(println "path-info:" path-info ", servlet-path:" servlet-path)
     [servlet-path
      (util/trim-slashes
       (if path-info path-info
@@ -49,3 +53,4 @@
 (defn GET? [] (= "GET" (method)))
 
 (defn POST? [] (= "POST" (method)))
+

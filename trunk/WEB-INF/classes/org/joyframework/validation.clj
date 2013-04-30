@@ -135,8 +135,7 @@
   (assoc m k (if-let [v (m k)]
                (conj (if (vector? v) v [v]) val) val)))
 
-(defn with-rules [{:keys [forward redirect input tiles] :as the-map}
-                   & rules]
+(defn validate [{:keys [forward redirect input tiles] :as the-map} & rules]
   (let [e (reduce #(if-let [[k msg] (%2)] (put % k msg) %) {} rules)]
     (if (seq e)
       (let [err (merge e (filter

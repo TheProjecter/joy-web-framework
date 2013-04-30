@@ -33,4 +33,14 @@
     <url-pattern>/joy/*</url-pattern>
   </servlet-mapping>
 
+  <filter>
+    <filter-name>upload</filter-name>
+    <filter-class>org.joyframework.UploadFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>upload</filter-name>
+    <servlet-name>joy</servlet-name>
+  </filter-mapping>
+
 </web-app>

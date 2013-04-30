@@ -15,7 +15,7 @@
         <fileset dir="${*jetty-home*}/lib">
           <include name="servlet-api-3.0.jar" />
         </fileset>
-        <fileset dir="lib" includes="clojure-1.5.1.jar" />
+        <fileset dir="lib" includes="*.jar" />
       </classpath>
     </javac>
   </target>
