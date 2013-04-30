@@ -13,7 +13,7 @@
               [org.joyframework.config :reload true :as conf]
               [clojure.java.jdbc :as sql]))
 
-(conf/set :routes (route/defroutes* 'org.joyframework.ddu)
+(conf/set :routes (route/defroutes 'org.joyframework.ddu)
           :date-format "yyyy-MM-dd")
 
 (db/defds ds {:driver "org.hsqldb.jdbc.JDBCDriver"
@@ -125,13 +125,11 @@
      (select-logs year month nil nil nil (page)))
   )
 
-(defn POST-logs-validate []
-  (vali/with-rules
+(defn POST-logs []
+  (vali/with-rules nil
     (vali/rule {:field-name "year"} vali/integer)
     (vali/rule {:field-name "month" :min 0 :max 13} vali/integer))
-  )
-
-(defn POST-logs []
+  
   (let [[year month date title tag]
         (req/param #(if (== 0 (count %)) nil %) "year" "month" "date" "title" "tag")]
     (sess/remove "all" "page")
@@ -164,17 +162,14 @@
      (map #(vector tid %) checked-tags)]))
 
 
-(defn ^{;; :forward "" :redirect "" :input (fn []) :tiles ""
-        :input #(rs/tiles "log-edit" req/*http-params* %
-                          {"tags" (select-tags (req/param "tag"))})}
-  POST-log-validate [id]
-  (vali/with-rules {"id" id}
+(defn POST-log [id]
+  (vali/with-rules {:input #(rs/tiles "log-edit" req/*http-params* %
+                                       {"tags" (select-tags (req/param "tag"))})
+                     "id" id}
     (vali/rule {:field-name "title" :max 50} vali/required vali/length)
     (vali/rule {:field-name "content" :max 2000} vali/required vali/length)
     (vali/rule {:field-name "tag"} vali/required))
-  )
 
-(defn POST-log [id]
   (let [[insert? log tags] (log-from-request id)]
     (sql/with-connection {:datasource ds}
       (if insert?
@@ -204,21 +199,19 @@
                  )) 
    ))
 
-(defn ^{:tiles "tag"} POST-tag-validate [id]
-  (vali/with-rules {"id" id}
-    (vali/rule {:field-name "tag" :min 3 :max 20} vali/required vali/length))
-  )
-
 (defn ^:token POST-tag [id]
+
+  (vali/with-rules {:tiles "tag" "id" id}
+    (vali/rule {:field-name "tag" :min 3 :max 20} vali/required vali/length))
+
   (let [insert? (<= (Integer/parseInt id) 0)
-        tid (if insert? (next-id) id)
-        tag (req/param "tag")]
+        tid (if insert? (next-id) id) tag (req/param "tag")]
     (sql/with-connection {:datasource ds}
       (if insert?
         (sql/insert-record "tags" {:id tid :tag tag})
         (sql/update-values "tags" ["id=?" tid] {:tag tag})))
-    (GET-tags)
-    ))
+    (GET-tags)))
+  
 
 (defmulti delete (fn [target _] target))
 
@@ -247,32 +240,21 @@
 (defmulti POST-validations (fn [x] x))
 
 (defmethod POST-validations "date" [_]
+  (vali/with-rules {:tiles "validations"}
+    (vali/rule {:field-name "date" :field-label "Input"
+                :after "2010-5-1" :before :now} vali/required vali/date))
   (rs/tiles "validations" {"date" (req/param "date") "validDate" true})
   )
 
 (defmethod POST-validations "email" [_]
+  (vali/with-rules {:tiles "validations"}
+    (vali/rule {:field-name "email" :field-label "Email"} vali/required vali/email))
   (rs/tiles "validations" {"email" (req/param "email") "validEmail" true})
   )
 
 (defmethod POST-validations "upload" [_]
   (println req/*http-params*)
   )
-
-(defmulti ^{:tiles "validations"} POST-validations-validate (fn [x] x))
-
-(defmethod POST-validations-validate "date" [_]
-  (vali/with-rules
-    (vali/rule {:field-name "date" :field-label "Input"
-                :after "2010-5-1" :before :now} vali/required vali/date))
-  )
-
-(defmethod POST-validations-validate "email" [_]
-  (vali/with-rules
-    (vali/rule {:field-name "email" :field-label "Email"} vali/required vali/email))
-  )
-
-(defmethod POST-validations-validate "upload" [_])
-
 
 (defn GET-upload [])
 

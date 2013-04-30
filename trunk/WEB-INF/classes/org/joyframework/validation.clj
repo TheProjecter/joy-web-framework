@@ -9,7 +9,8 @@
             [clojure.string :as str])
   (:import (org.joda.time DateTime)
            (java.util Date Calendar)
-           (java.util.regex Matcher Pattern))
+           (java.util.regex Matcher Pattern)
+           org.joyframework.ValidationException)
   )
 
 (def __jf_page_err__ "__jf_page_err__")
@@ -134,10 +135,21 @@
   (assoc m k (if-let [v (m k)]
                (conj (if (vector? v) v [v]) val) val)))
 
-(defn with-rules [& rules]
-  (let [err (reduce (fn [m rule]
-                      (if-let [[k msg] (rule)] (put m k msg) m))
-                    {} (filter #(fn? %) rules))]
-    (if (seq err)
-      (apply merge err (filter #(map? %) rules)))
+(defn with-rules [{:keys [forward redirect input tiles] :as the-map}
+                   & rules]
+  (let [e (reduce #(if-let [[k msg] (%2)] (put % k msg) %) {} rules)]
+    (if (seq e)
+      (let [err (merge e (filter
+                          (fn [[k v]] (and (not= k :forward)
+                                           (not= k :redirect)
+                                           (not= k :input)
+                                           (not= k :tiles))) the-map))]
+        (cond
+         forward (rs/forward forward req/*http-params* err)
+         tiles (rs/tiles tiles req/*http-params* err)
+         redirect (rs/redirect redirect err)
+         input (input err)
+         :else (rs/redirect (req/param "__jf_src_page__") err))
+        (throw (ValidationException.))
+        ))
     ))
