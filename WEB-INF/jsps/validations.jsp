@@ -25,7 +25,8 @@
           method='post' enctype='multipart/form-data'>
       <input type='text' name='field1' />
       <input type='text' name='field2' />      
-      <input type='file' name='file' />
+      <input type='file' name='myfile' />
+      <input type='file' name='myfile2' />
       <input type='submit' value='${res["submit"]}' />      
     </form>
   </td></tr>

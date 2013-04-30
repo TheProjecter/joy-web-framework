@@ -23,58 +23,53 @@ import java.util.Map;
 
 public class JoyServlet extends HttpServlet {
 
-  private static final String CONTENT_TYPE = "text/html; charset=windows-1252";
+  private final static String CONTENT_TYPE = "text/html; charset=windows-1252";
 
-  @SuppressWarnings("compatibility:7579876346806444927")
-  private static final long serialVersionUID = 1L;
+  private final static IFn _require = var("clojure.core", "require");
+  private final static IFn _find_ns = var("clojure.core", "find-ns");
+  private final static IFn _ns_pubs = var("clojure.core", "ns-publics");
 
-  
 
-  /**
-   *
-   */
+  private final static String CLAY_ROUTE = "org.joyframework.route";
+  private final static String RESOURCES = "org.joyframework.resources";
+
+  private static boolean _reload_allowed = false;
+
+  private Map _bootstrap_map;  
+  private static String _bootstrap_ns;
+
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
-
-    _bootstrap = config.getInitParameter("bootstrap");
-
-    require(CLAY_ROUTE, _bootstrap);
+    _reload_allowed = Boolean.valueOf(config.getInitParameter("reload-allowed"));
+    
+    _bootstrap_ns = config.getInitParameter("bootstrap");
+    require(CLAY_ROUTE, _bootstrap_ns);
 
     prepareResources(config.getServletContext());
 
-    _m = (Map)_nsPubs.invoke(_findNs.invoke(Symbol.intern(_bootstrap)));
-    
-    _reloadAllowed =
-      Boolean.valueOf(config.getInitParameter("reload-allowed"));
+    _bootstrap_map =
+      (Map)_ns_pubs.invoke(_find_ns.invoke(Symbol.intern(_bootstrap_ns)));
+
   }
 
-  /**
-   *
-   */
   public void doGet(final HttpServletRequest request,
                     final HttpServletResponse response) {
     process(request, response);
   }
 
-  /**
-   *
-   */
   public void doPost(final HttpServletRequest request,
                      final HttpServletResponse response) {
     process(request, response);
   }
 
-  /**
-   *
-   */
   private void process(final HttpServletRequest request,
                        final HttpServletResponse response) {
 
     if (null != request.getParameter("reload")) {
-      if (_reloadAllowed) {
-        reload(CLAY_ROUTE, _bootstrap);
+      if (_reload_allowed) {
+        reload(CLAY_ROUTE, _bootstrap_ns);
         prepareResources(request.getSession().getServletContext());
-        _m = (Map)_nsPubs.invoke(_findNs.invoke(Symbol.intern(_bootstrap)));
+        _bootstrap_map = (Map)_ns_pubs.invoke(_find_ns.invoke(Symbol.intern(_bootstrap_ns)));
       }
       else
         try {
@@ -86,21 +81,14 @@ public class JoyServlet extends HttpServlet {
         }
     }
 
-    var(CLAY_ROUTE, "service").invoke(_m, request, response);
+    var(CLAY_ROUTE, "service").invoke(_bootstrap_map, request, response);
   }
 
-
-  /**
-   *
-   */
   private static void require(final String... libs) {
     for (final String lib : libs)
       _require.invoke(Symbol.intern(lib));
   }
 
-  /**
-   *
-   */
   private static void reload(final String... libs) {
     for (final String lib : libs) {
       System.out.format("reloading %s...%n", lib);
@@ -113,29 +101,8 @@ public class JoyServlet extends HttpServlet {
     final Set<Map.Entry> s = res.entrySet();
     for (final Map.Entry e : s) {
       final Keyword kd = (Keyword)e.getKey();
-      //System.out.println(kd.getName());
       ctxt.setAttribute(kd.getName(), e.getValue());
     }
   }
 
-  //private Var _rt;
-
-  /**
-   *
-   */
-  private final static IFn _require = var("clojure.core", "require");
-
-  private final static IFn _findNs = var("clojure.core", "find-ns");
-
-  private final static IFn _nsPubs = var("clojure.core", "ns-publics");
-
-  private static String _bootstrap;
-
-  private final static String
-    CLAY_ROUTE = "org.joyframework.route",
-    RESOURCES = "org.joyframework.resources";
-
-  private static boolean _reloadAllowed = false;
-
-  private Map _m;
 }

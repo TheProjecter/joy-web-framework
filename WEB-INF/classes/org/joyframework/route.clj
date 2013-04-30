@@ -23,6 +23,10 @@
 (declare get-route get-handler get-handler-from-path
          checkbox validate valid-http-method? token)
 
+(defn- invoke [h args]
+  (apply h args)
+  )
+
 (defn service
   ""
   [bss request response]
@@ -32,14 +36,12 @@
             req/*http-params* (req/params request)
             sess/*http-session* (.getSession request)
             ctxt/*servlet-context* (.. request getSession getServletContext)]
-    (let [[s p q] (req/path)
-          [handler args ns] (get-handler (get-route p))]
+    (let [[s p q] (req/path) [handler args ns] (get-handler (get-route p))]
       (flash/reinstate)
+      (req/set "__jf_src_page__" (str p (if q "?") q))
       (try
         (if handler
-          (let [mh (meta handler)]
-            (req/set "__jf_src_page__" (str p (if q "?") q))
-            (apply handler args))
+          (invoke handler args)
           (r/not-found))
         (catch ValidationException ex (println "validation.exception"))
         (catch Exception ex
@@ -47,12 +49,6 @@
           ))
       )))
 
-(defn- valid-http-method? ""
-  [handler]
-  (let [m (meta handler)]
-    (if-not (cond (:GET m) (req/GET?) (:POST m) (req/POST?) :else true)
-      (throw (RuntimeException. "invalid.http.method")))
-    ))
 
 (defn- token ""
   [mh]

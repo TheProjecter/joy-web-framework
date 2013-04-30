@@ -4,8 +4,6 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5">
-
-
   <listener>
     <!--
         <listener-class>
@@ -29,6 +27,16 @@
       <param-value>true</param-value>
     </init-param>
   </servlet>
+
+  <filter>
+    <filter-name>upload</filter-name>
+    <filter-class>org.joyframework.UploadFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>upload</filter-name>
+    <servlet-name>joy</servlet-name>
+  </filter-mapping>
 
   <servlet-mapping>
     <servlet-name>joy</servlet-name>

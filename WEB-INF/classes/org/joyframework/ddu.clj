@@ -126,7 +126,7 @@
   )
 
 (defn POST-logs []
-  (vali/with-rules nil
+  (vali/validate nil
     (vali/rule {:field-name "year"} vali/integer)
     (vali/rule {:field-name "month" :min 0 :max 13} vali/integer))
   
@@ -163,7 +163,7 @@
 
 
 (defn POST-log [id]
-  (vali/with-rules {:input #(rs/tiles "log-edit" req/*http-params* %
+  (vali/validate {:input #(rs/tiles "log-edit" req/*http-params* %
                                        {"tags" (select-tags (req/param "tag"))})
                      "id" id}
     (vali/rule {:field-name "title" :max 50} vali/required vali/length)
@@ -201,7 +201,7 @@
 
 (defn ^:token POST-tag [id]
 
-  (vali/with-rules {:tiles "tag" "id" id}
+  (vali/validate {:tiles "tag" "id" id}
     (vali/rule {:field-name "tag" :min 3 :max 20} vali/required vali/length))
 
   (let [insert? (<= (Integer/parseInt id) 0)
@@ -240,24 +240,25 @@
 (defmulti POST-validations (fn [x] x))
 
 (defmethod POST-validations "date" [_]
-  (vali/with-rules {:tiles "validations"}
+  (vali/validate {:tiles "validations"}
     (vali/rule {:field-name "date" :field-label "Input"
                 :after "2010-5-1" :before :now} vali/required vali/date))
   (rs/tiles "validations" {"date" (req/param "date") "validDate" true})
   )
 
 (defmethod POST-validations "email" [_]
-  (vali/with-rules {:tiles "validations"}
+  (vali/validate {:tiles "validations"}
     (vali/rule {:field-name "email" :field-label "Email"} vali/required vali/email))
   (rs/tiles "validations" {"email" (req/param "email") "validEmail" true})
   )
 
 (defmethod POST-validations "upload" [_]
+  ;;(println "myfile :" (.ContentType (req/param "myfile")))
   (println req/*http-params*)
   )
 
 (defn GET-upload [])
 
-(defn ^:timer ^:logger POST-upload []
-  (println req/*http-params*)
+(defn POST-upload []
+  (println ("myfile :" (req/param "myfile")))
   ) 
