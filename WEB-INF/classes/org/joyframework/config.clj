@@ -7,15 +7,11 @@
   )
 
 (defmacro set* [v val]
-  (if val `(alter-var-root (var ~v) (fn [_#] ~val)))
-  )
+  `(alter-var-root (var ~v) (fn [_#] ~val)))
 
 (defn set [& xs]
-  (let [conf (apply hash-map xs)
-        ep (:email-pattern conf)
-        email-pattern (if ep (Pattern/compile ep))
-        ]
+  (let [conf (apply hash-map xs) ep (:email-pattern conf)]
     (set* rt/__jf_routes__ (:routes conf))
     (set* vali/__jf_date_format__ (:date-format conf))
-    (set* vali/__jf_email_pattern__ email-pattern)
+    (if ep (set* vali/__jf_email_pattern__ (Pattern/compile ep)))
     ))

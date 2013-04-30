@@ -11,7 +11,8 @@
             [org.joyframework.context :as ctxt]
             [org.joyframework.flash :as flash :reload true]
             [org.joyframework.util :as util :reload true])
-  (:import java.io.FileNotFoundException))
+  (:import java.io.FileNotFoundException
+           org.joyframework.ValidationException))
 
 (def ^:dynamic *bootstraps* "Mappings in the bootstrap namespace.")
 
@@ -35,33 +36,16 @@
           [handler args ns] (get-handler (get-route p))]
       (flash/reinstate)
       (try
-        (if-let [mh (meta handler)]
-          (when (and (token mh)
-                     (validate mh ns args)) 
+        (if handler
+          (let [mh (meta handler)]
             (req/set "__jf_src_page__" (str p (if q "?") q))
-            (apply handler args)
-            )
+            (apply handler args))
           (r/not-found))
+        (catch ValidationException ex (println "validation.exception"))
         (catch Exception ex
           (if-let [h ('exception-handler *bootstraps*)] (h ex) (throw ex))
           ))
       )))
-
-(defn- validate [m ns args]
-  (let [v (or (:vali m) ((ns-publics ns) (symbol (str (:name m) "-validate"))))
-        errors (if v (apply v args))]
-    ;;(println "errors ==>" errors)
-    (if (empty? errors) true
-        (let [{:keys [forward tiles redirect input]} (meta v)]
-          (cond
-           forward (r/forward forward req/*http-params* errors)
-           tiles (r/tiles tiles req/*http-params* errors)
-           redirect (r/redirect redirect errors)
-           input (input errors)
-           :else (r/redirect (req/param "__jf_src_page__") errors)
-           ))
-        ))
-  )
 
 (defn- valid-http-method? ""
   [handler]
@@ -113,11 +97,11 @@
     (or (ns-pubs (symbol (str (req/method) "-" fst)))
         (ns-pubs (symbol fst)))))
 
-(defmacro defroutes
-  "Usage: (defroutes [a.b.c d e] x.y.z)"  
-  [name & nss]
-  `(def ~name (defroutes* '~@nss))
-  )
+;;(defmacro defroutes
+;;  "Usage: (defroutes [a.b.c d e] x.y.z)"  
+;;  [name & nss]
+;;  `(def ~name (defroutes* '~@nss))
+;;  )
 
 (defn- build-routes-map
   ""
@@ -145,7 +129,7 @@
       (res/load-resources (keyword rk) (ns-name the-ns)))
     the-ns))
 
-(defn defroutes*
+(defn defroutes
   "Usage: (defroutes* '[a.b.c d e] 'x.y.z)"
   [& nss]
   ;;(println "nss:" nss)

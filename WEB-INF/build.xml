@@ -9,7 +9,7 @@
   
   <target name="compile">
     <echo message='${version}' />
-    <javac srcdir="src/java" destdir="classes" debug="on"
+    <javac srcdir="src" destdir="classes" debug="on"
            debuglevel="vars">
       <classpath>
         <fileset dir="${*jetty-home*}/lib">
