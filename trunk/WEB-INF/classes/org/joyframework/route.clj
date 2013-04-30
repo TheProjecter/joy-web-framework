@@ -17,6 +17,8 @@
 
 (def INDEX (symbol "index"))
 
+(def __jf_routes__)
+
 (declare get-route get-handler get-handler-from-path
          checkbox validate valid-http-method? token)
 
@@ -89,7 +91,7 @@
 
 (defn- get-route ""
   [p]
-  (loop [[r & rs :as path] (str/split p #"/") m (var-get ('__jf_rt__ *bootstraps*))]
+  (loop [[r & rs :as path] (str/split p #"/") m __jf_routes__]
     (if-let [sub-rt (m r)]
       (recur rs sub-rt) (assoc m :path path)))
   )

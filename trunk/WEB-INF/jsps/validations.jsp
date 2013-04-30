@@ -21,9 +21,12 @@
   </td></tr>
   <tr ><td style='height: 20px'> </td></tr>
   <tr><td>
-    <form action='validations/date-after' method='post'>
-      <input type='text' name='date' />
-      <input type='submit' value='${res["submit"]}' />
+    <form action='/ddu/joy/validations/upload'
+          method='post' enctype='multipart/form-data'>
+      <input type='text' name='field1' />
+      <input type='text' name='field2' />      
+      <input type='file' name='file' />
+      <input type='submit' value='${res["submit"]}' />      
     </form>
   </td></tr>
 </table>
