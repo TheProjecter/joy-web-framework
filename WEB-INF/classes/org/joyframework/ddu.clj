@@ -10,12 +10,11 @@
               [org.joyframework.validation :reload true :as vali]
               [org.joyframework.util :reload true :as u]
               [org.joyframework.datetime :reload true :as dt]
-              [org.joyframework.config :reload true :as cf]
+              [org.joyframework.config :reload true :as conf]
               [clojure.java.jdbc :as sql]))
 
-(route/defroutes __jf_rt__ org.joyframework.ddu)
-
-(cf/config :date-format "yyyy-MM-dd")
+(conf/set :routes (route/defroutes* 'org.joyframework.ddu)
+          :date-format "yyyy-MM-dd")
 
 (db/defds ds {:driver "org.hsqldb.jdbc.JDBCDriver"
               :subprotocol "hsqldb"
@@ -255,8 +254,8 @@
   (rs/tiles "validations" {"email" (req/param "email") "validEmail" true})
   )
 
-(defmethod POST-validations "date-after" [_]
-  (println "date-after")
+(defmethod POST-validations "upload" [_]
+  (println req/*http-params*)
   )
 
 (defmulti ^{:tiles "validations"} POST-validations-validate (fn [x] x))
@@ -272,10 +271,11 @@
     (vali/rule {:field-name "email" :field-label "Email"} vali/required vali/email))
   )
 
-(defmethod POST-validations-validate "date-after" [_]
-  (println "validate-date-after")
-  )
+(defmethod POST-validations-validate "upload" [_])
+
 
 (defn GET-upload [])
 
-(defn ^{:before (fn []) :after (fn [])} ^:upload POST-upload []) 
+(defn ^:timer ^:logger POST-upload []
+  (println req/*http-params*)
+  ) 
