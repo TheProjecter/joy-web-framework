@@ -18,7 +18,15 @@
         <a href='/ddu/joy/logs?search'>${res['advanced']}</a>
       </td>
     </form>
-    <td align='right' > </td>
+    <td >
+      <table width='100%' border='0'>
+        <tr>
+          <td width='80'><a href='/ddu/joy/log/0'>${res['new.log']}</a></td>
+          <td width='80'><a href='/ddu/joy/tag/0'>${res['new.tag']}</a></td>
+          <td><a href='/ddu/joy/tags'>${res['tags']}</a></td>
+        </tr>
+      </table>
+    </td>
   </tr>
 </table>
 
