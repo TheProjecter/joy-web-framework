@@ -7,7 +7,6 @@
   <tr>
     <td colspan='4'>
       <table width='100%'><tr>
-        <td width='60'><a href='/ddu/joy/log/0' >${res['new']}</a></td>
         <td align='right'>
           <table border='1' width='300'>
             <tr>
