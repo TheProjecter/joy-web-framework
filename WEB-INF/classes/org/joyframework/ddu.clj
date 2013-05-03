@@ -199,7 +199,9 @@
                  )) 
    ))
 
-(defn ^:token POST-tag [id]
+(defn POST-tag [id]
+
+  (sess/token)
 
   (vali/validate {:tiles "tag" "id" id}
     (vali/rule {:field-name "tag" :min 3 :max 20} vali/required vali/length))

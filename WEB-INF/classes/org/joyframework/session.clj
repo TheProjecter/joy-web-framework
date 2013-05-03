@@ -1,6 +1,7 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.session
+  (:require [org.joyframework.request :as req])
   (:import javax.servlet.http.HttpSession))
 
 (def ^:dynamic *http-session*)
@@ -21,3 +22,11 @@
 (defn attr? [name] (not (nil? (get name))))
 
 (defn cancel [] (.invalidate *http-session*))
+
+(defn token 
+  ([] (token #(throw (RuntimeException. "invalid.token"))))
+  ([h]
+     (let [tn (get "__jf_tk_name__") tv (get "__jf_tk_value__")]
+       (remove "__jf_tk_name__" "__jf_tk_value__")
+       (if-not (and tn tv (= (req/param tn) tv)) (h))))
+  )

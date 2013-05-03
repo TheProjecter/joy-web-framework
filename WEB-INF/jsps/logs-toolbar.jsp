@@ -4,8 +4,6 @@
 <%@ taglib prefix='fmt' uri='http://java.sun.com/jsp/jstl/fmt' %>
 <%@ taglib prefix='jf' tagdir='/WEB-INF/tags' %>
 
-<jf:errors />
-
 <table width='100%' border='1'>
   <tr>
     <form method='post' action='/ddu/joy/logs?page=1' >

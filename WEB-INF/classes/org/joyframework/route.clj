@@ -50,15 +50,6 @@
       )))
 
 
-(defn- token ""
-  [mh]
-  (if-not (:token mh) true
-          (let [tn (sess/get "__jf_tk_name__") tv (sess/get "__jf_tk_value__")]
-            (sess/remove "__jf_tk_name__" "__jf_tk_value__")
-            (if (and tn tv (= (req/param tn) tv)) true
-              (throw (RuntimeException. "invalid.token"))))
-          ))
-
 (defn- checkbox "" [handler]
   (let [chks
         (reduce (fn [m [k v]]
