@@ -13,8 +13,7 @@
               [org.joyframework.config :reload true :as conf]
               [clojure.java.jdbc :as sql]))
 
-(conf/set :routes (route/defroutes 'org.joyframework.ddu)
-          :date-format "yyyy-MM-dd")
+(conf/set :routes (route/defroutes 'org.joyframework.ddu))
 
 (db/defds ds {:driver "org.hsqldb.jdbc.JDBCDriver"
               :subprotocol "hsqldb"

@@ -29,7 +29,7 @@ public class UploadFilter implements Filter {
 
   public void doFilter(final ServletRequest req, final ServletResponse resp,
                        final FilterChain fchain) throws IOException, ServletException {
-    System.out.println("filter: before");
+    //System.out.println("filter: before");
     final HttpServletRequest hreq = (HttpServletRequest)req;
     if (ServletFileUpload.isMultipartContent(hreq)) {
       final ServletFileUpload sfu = new ServletFileUpload();
@@ -38,7 +38,7 @@ public class UploadFilter implements Filter {
     else {
       fchain.doFilter(req, resp);
     }
-    System.out.println("filter: after");
+    //System.out.println("filter: after");
   }
 
   public void destroy() {}

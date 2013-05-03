@@ -38,11 +38,11 @@
   (let [path-info (or (.getPathInfo *http-request*) "/")
         servlet-path (.getServletPath *http-request*)]
     [servlet-path
-     (util/trim-slashes
+     (util/trim
       (if path-info path-info
           (let [i (.lastIndexOf servlet-path ".")]
             (if (== -1 i) servlet-path
-                (.substring servlet-path 0 i)))))
+                (.substring servlet-path 0 i)))) "/")
      (.getQueryString *http-request*)]
     ))
 
