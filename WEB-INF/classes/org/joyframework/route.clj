@@ -20,12 +20,10 @@
 
 (def __jf_routes__)
 
-(declare get-route get-handler get-handler-from-path
-         checkbox validate valid-http-method? token)
+(declare get-route get-handler get-handler-from-path checkbox)
 
 (defn- invoke [h args]
-  (apply h args)
-  )
+  (apply h args))
 
 (defn service
   ""
@@ -140,15 +138,8 @@
 
          ;; build a vector out of each namespace for later use
          ;; i.e. a.b.c ==> ["a" "b" "c" {:ns a.b.c}]
-         (map #(let [md (meta %)
-                     path-md (:path md)
-                     ;;_ (println "path-md:" path-md)
-                     path (or (and path-md
-                                   (str/split (util/trim-slashes path-md) #"/"))
-                              (str/split (str (ns-name %)) #"\."))
-                     ;;_ (println "ns:" % ", path:" path) 
-                     ]
-                 (conj path {:ns %})))
+         (map #(conj (or (util/split (util/trim (:path (meta %)) "/") #"/")
+                         (str/split (str (ns-name %)) #"\.")) {:ns %}))
 
          ;;build a route table tree out of the vectors
          ;;from the last step

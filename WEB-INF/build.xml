@@ -2,10 +2,13 @@
 
 <project name="joyframework">
 
+  <tstamp />
+
   <property name="*jetty-home*"
             value="/py/opt/jetty-distribution-8.1.8.v20121106/" />
 
   <property file='build.properties' />
+  <property name='joy.jar' value='${build.dir}/joy-SNAPSHOT-${DSTAMP}.jar' />
   
   <target name="compile">
     <echo message='${version}' />
@@ -23,8 +26,7 @@
   <target name="build">
     <mkdir dir='${build.dir}' />
     <jar destfile="${joy.jar}" basedir="classes"
-         includes="**/JoyServlet.class, **/*.clj,
-                   **/resources.properties"
+         includes="**/*.class, **/*.clj, **/resources.properties"
          excludes="**/blank.clj, **/ddu.clj"
          />
   </target>
@@ -51,9 +53,14 @@
     <copy file='classes/org/joyframework/blank.clj'
           todir='${blank.war.dir}/WEB-INF/classes/org/joyframework' />
 
-    <war destfile='${blank.war}' basedir='${blank.war.dir}' />
+
+    <war destfile='${build.dir}/joy-blank-${DSTAMP}.war' basedir='${blank.war.dir}' />
 
     <delete dir='${blank.war.dir}' />
+  </target>
+
+  <target name='clean'>
+    <delete dir='${build.dir}' />
   </target>
 
 </project>

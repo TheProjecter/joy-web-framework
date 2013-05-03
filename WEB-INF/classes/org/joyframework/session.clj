@@ -2,7 +2,8 @@
 
 (ns org.joyframework.session
   (:require [org.joyframework.request :as req])
-  (:import javax.servlet.http.HttpSession))
+  (:import javax.servlet.http.HttpSession
+           org.joyframework.TokenException))
 
 (def ^:dynamic *http-session*)
 
@@ -23,10 +24,10 @@
 
 (defn cancel [] (.invalidate *http-session*))
 
-(defn token 
-  ([] (token #(throw (RuntimeException. "invalid.token"))))
-  ([h]
-     (let [tn (get "__jf_tk_name__") tv (get "__jf_tk_value__")]
-       (remove "__jf_tk_name__" "__jf_tk_value__")
-       (if-not (and tn tv (= (req/param tn) tv)) (h))))
+(defn token
+  ([] (let [tn (get "__jf_tk_name__") tv (get "__jf_tk_value__")]
+        (remove "__jf_tk_name__" "__jf_tk_value__")
+        (if-not (and tn tv (= (req/param tn) tv)) (throw (TokenException.)))
+        ))
+  ([h] (try (token) (catch TokenException _ (h))))
   )
