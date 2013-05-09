@@ -1,16 +1,16 @@
 ;; Copyright (c) Pengyu Yang. All rights reserved
 
 (ns org.joyframework.datetime
-  ;;(:require [clj-time.format :as ctf] [clj-time.core :as ctc])
+  (:require [clj-time.format :as ctf] [clj-time.core :as ctc])
   (:import (org.joda.time.format DateTimeFormat DateTimeFormatter ISODateTimeFormat)
            (org.joda.time DateTime))
   )
 
 (def formatters
-  {"yyyyMMdd" (ISODateTimeFormat/basicDate) 
-   "yyyy/MM/dd" (DateTimeFormat/forPattern "yyyy/MM/dd")
-   "yyyy-MM-dd" (ISODateTimeFormat/date)}
-  ;;(into ctf/formatters)
+  (into ctf/formatters
+        {"yyyyMMdd" (ISODateTimeFormat/basicDate) 
+         "yyyy/MM/dd" (DateTimeFormat/forPattern "yyyy/MM/dd")
+         "yyyy-MM-dd" (ISODateTimeFormat/date)}) 
   )
 
 (defn parse* [h #^DateTimeFormatter fmtr #^String s]
@@ -37,18 +37,13 @@
        (parse-ex nil s k))))
 
 (defn today []
-  ;;(let [d (ctc/today)] [(ctc/year d) (ctc/month d) (ctc/day d)])
-  ;;(let [d (DateTime/now)] [(.getYear d) (.getMonthOfYear d) (.getDayOfMonth d)])
+  (let [d (ctc/today)] [(ctc/year d) (ctc/month d) (ctc/day d)])
   )
 
 (defn before? [#^DateTime this #^DateTime that]
-  ;;(println "before? this:" this ", that:" that)
-  ;;(ctc/before? this that)
-  (.isBefore this that)
+  (ctc/before? this that)
   )
 
 (defn after? [#^DateTime this #^DateTime that]
-  ;;(println "after? this:" this ", that:" that)
-  ;;(ctc/after? this that)
-  (.isAfter this that)
+  (ctc/after? this that)
   )
