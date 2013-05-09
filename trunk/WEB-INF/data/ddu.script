@@ -41,7 +41,7 @@ CREATE MEMORY TABLE PUBLIC.LOGS(ID BIGINT NOT NULL PRIMARY KEY,TITLE VARCHAR(128
 CREATE MEMORY TABLE PUBLIC.TAGS(ID BIGINT NOT NULL PRIMARY KEY,TAG VARCHAR(128))
 CREATE MEMORY TABLE PUBLIC.LOG_TAGS(LOG_ID BIGINT NOT NULL,TAG_ID BIGINT NOT NULL)
 ALTER SEQUENCE SYSTEM_LOBS.LOB_ID RESTART WITH 1
-ALTER SEQUENCE PUBLIC.SEQ RESTART WITH 82
+ALTER SEQUENCE PUBLIC.SEQ RESTART WITH 83
 SET DATABASE DEFAULT INITIAL SCHEMA PUBLIC
 GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.YES_OR_NO TO PUBLIC
 GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.TIME_STAMP TO PUBLIC
@@ -88,6 +88,7 @@ INSERT INTO LOGS VALUES(78,'great white hope','someone (or something) expected t
 INSERT INTO LOGS VALUES(79,'for a song','cheaply\u000d\u000a<br />\u000d\u000a<br />\u000d\u000aTypically\u000d\u000a<ul>\u000d\u000a<li>buy something ~</li>\u000d\u000a<li>get something ~</li>\u000d\u000a<li>pick up someone ~</li>\u000d\u000a</ul>\u000d\u000a\u000d\u000a<span style=''font-style:italic; color: green''>\u000d\u000aThis is one of my favourite pieces of furniture and I got it for a song in a market.\u000d\u000a</span>\u000d\u000a<br/>',2013,4,25)
 INSERT INTO LOGS VALUES(80,'string (someone) along','to continue to deceive or trick (someone) for a long time\u000d\u000a\u000d\u000a<ul>\u000d\u000a<li>\u000d\u000aHe was just <span style=''font-style:italic; color:blue; text-decoration:underline''>stringing us along with</span> false promises.\u000d\u000a</li>\u000d\u000a<li>\u000d\u000aHe really loved her but she was just <span style=''font-style:italic; color:blue; text-decoration:underline''>stringing him along</span>. \u000d\u000a</li>\u000d\u000a</ul>',2013,4,25)
 INSERT INTO LOGS VALUES(81,'beat a dead horse','<ol>\u000d\u000a<li>\u000d\u000ato keep talking about a subject that has already been discussed or decided \u000d\u000a<ul>\u000d\u000a<li>\u000d\u000aI don''t mean to <span style=''font-style:italic; text-decoration:underline;font-weight:bold''>beat a dead horse</span>, but I still don''t understand what happened.\u000d\u000a</li>\u000d\u000a</ul>\u000d\u000a</li>\u000d\u000a<br />\u000d\u000a<li>\u000d\u000ato waste time and effort trying to do something that is impossible \u000d\u000a<ul>\u000d\u000a<li>\u000d\u000a Is it just <span style=''font-style:italic; text-decoration:underline;font-weight:bold''>beating a dead horse</span> to ask for another recount of the votes?\u000d\u000a</li>\u000d\u000a</ul>\u000d\u000a</li>\u000d\u000a</ol>',2013,4,25)
+INSERT INTO LOGS VALUES(82,'head start','an advantage that you have or get when you are starting to do something \u000d\u000a\u000d\u000a<ul>\u000d\u000a<li>\u000d\u000aShe took some extra classes to get <span style=''font-weight:bold; font-style:italic''>a head start</span> in/on her career. \u000d\u000a</li>\u000d\u000a</ul>',2013,5,9)
 INSERT INTO TAGS VALUES(37,'tag2')
 INSERT INTO TAGS VALUES(38,'ggs')
 INSERT INTO TAGS VALUES(53,'english')
@@ -123,3 +124,4 @@ INSERT INTO LOG_TAGS VALUES(78,53)
 INSERT INTO LOG_TAGS VALUES(79,53)
 INSERT INTO LOG_TAGS VALUES(80,53)
 INSERT INTO LOG_TAGS VALUES(81,53)
+INSERT INTO LOG_TAGS VALUES(82,53)
