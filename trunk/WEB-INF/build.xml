@@ -34,7 +34,7 @@
     </copy>
 
     <copy todir='${blank.war.dir}/WEB-INF'>
-      <fileset dir='${blank.webapp.dir}' includes='*.xml' />
+      <fileset dir='${blank.webapp.dir}' includes='*.xml, *.properties' />
     </copy>
 
     <copy todir='${blank.war.dir}/WEB-INF/tags'>
