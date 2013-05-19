@@ -4,26 +4,21 @@
 
   <tstamp />
 
-  <property name="*jetty-home*"
-            value="/py/opt/jetty-distribution-8.1.8.v20121106/" />
-
   <property file='build.properties' />
   <property name='joy.jar' value='${build.dir}/joy-SNAPSHOT-${DSTAMP}.jar' />
   
   <target name="compile">
-    <echo message='${version}' />
+    <echo message='${servlet.jar}' />
     <javac srcdir="src" destdir="classes" debug="on"
            debuglevel="vars">
       <classpath>
-        <fileset dir="${*jetty-home*}/lib">
-          <include name="servlet-api-3.0.jar" />
-        </fileset>
         <fileset dir="lib" includes="*.jar" />
+        <pathelement location='${servlet.jar}' />
       </classpath>
     </javac>
   </target>
 
-  <target name="build">
+  <target name="build" depends='compile'>
     <mkdir dir='${build.dir}' />
     <jar destfile="${joy.jar}" basedir="classes"
          includes="**/*.class, **/*.clj, **/resources.properties"
