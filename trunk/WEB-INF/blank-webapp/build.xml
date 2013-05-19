@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<project name="joy-seed">
+  <tstamp />
+  <property file='build.properties' />
+  
+  <target name="build">
+    <mkdir dir='${build.dir}' />
+    <war destfile='${build.dir}/joy-seed-${DSTAMP}.war' 
+         basedir='..' excludes='**/build/**, **/build.xml, **/build.properties'/>    
+  </target>
+
+  <target name='clean'>
+    <delete dir='${build.dir}' />
+  </target>
+
+</project>
