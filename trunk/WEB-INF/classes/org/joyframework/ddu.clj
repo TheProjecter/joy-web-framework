@@ -11,6 +11,7 @@
               [org.joyframework.util :reload true :as u]
               [org.joyframework.datetime :reload true :as dt]
               [org.joyframework.config :reload true :as conf]
+              [org.joyframework.context :reload true :as ctxt]
               [clojure.java.jdbc :as sql]))
 
 (conf/set :routes (route/defroutes 'org.joyframework.ddu))
@@ -20,7 +21,9 @@
               :subname "hsql://localhost/ddu"
               :user "SA"})
 
-(defn index [] (rs/tiles "index"))
+(defn index []
+  ;;(println (ctxt/real-path "/WEB-INF/py/opt"))
+  (rs/tiles "index"))
 
 (defn- page []
   (if-let [p (req/param "page")] (sess/set "page" p) (sess/get "page" "1")))
