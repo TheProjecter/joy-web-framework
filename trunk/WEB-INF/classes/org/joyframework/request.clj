@@ -50,6 +50,8 @@
 
 (defn method [] (.getMethod *http-request*))
 
+(defn reader [] (.getReader *http-request*))
+
 (defn GET? [] (= "GET" (method)))
 
 (defn POST? [] (= "POST" (method)))
